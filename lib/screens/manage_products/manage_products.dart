@@ -119,7 +119,8 @@ class ManageProductsScreen extends StatelessWidget {
       ),
 
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
+          backgroundColor: defaultColor,
+          child: Icon(Icons.add, color: Colors.black,),
           onPressed: () {
             Get.to(AddProductScreen());
           }),

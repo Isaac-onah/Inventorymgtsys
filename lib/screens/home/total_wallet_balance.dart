@@ -21,7 +21,7 @@ class TotalWalletBalance extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(25),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color:const Color(0xFF2C2C2E),
           borderRadius: BorderRadius.all(
             Radius.circular(20),
           ),
@@ -33,8 +33,8 @@ class TotalWalletBalance extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                const Expanded(
-                  child: Text('Total Wallet Balance'),
+                Expanded(
+                  child: Text('Total Wallet Balance', style: TextStyle(color: Colors.white.withOpacity(0.6)),),
                 ),
               ],
             ),
@@ -47,7 +47,7 @@ class TotalWalletBalance extends StatelessWidget {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 38,
-                    color: Colors.black.withOpacity(0.6),
+                    color: Colors.white,
                   ),
                 ),
                 // for increment decrement

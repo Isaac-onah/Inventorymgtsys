@@ -31,39 +31,39 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     final double spacing = 12;
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-        child: Column(
-          children: [
-            Consumer<AuthController>(builder: (context, controller, child) {
-              return _myDrawer(controller, context);
-            }),
-            const SizedBox(height: 25),
-            TotalWalletBalance(
-              context: context,
-              totalBalance: '\$39.584',
-              crypto: "7.251332 BTC",
-              percentage: 3.55,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 25),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('POS Services', style: TextStyle(color: Colors.black38)),
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: GridView.count(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                Consumer<AuthController>(builder: (context, controller, child) {
+                  return _myDrawer(controller, context);
+                }),
+                const SizedBox(height: 25),
+                TotalWalletBalance(
+                  context: context,
+                  totalBalance: '\$39.584',
+                  crypto: "7.251332 BTC",
+                  percentage: 3.55,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 25),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Inventory Report', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                GridView.count(
                   physics: NeverScrollableScrollPhysics(),
                   // Disable GridView's scrolling
                   shrinkWrap: true,
@@ -71,8 +71,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                   crossAxisCount: 2,
                   // Number of columns in the grid
                   crossAxisSpacing: 10.0,
-                  // Spacing between columns
-                  mainAxisSpacing: 10.0,
+                  // Spacing between column
                   childAspectRatio: 0.85,
                   // Spacing between rows
                   children: [
@@ -89,7 +88,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                           var tdate = value != null
                               ? value.toString().split(' ')
                               : null;
-
+        
                           if (tdate == null) {
                             showToast(
                                 message: "date must be not empty or null ",
@@ -111,9 +110,9 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       textColor: Colors.white,
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(40),
-                        topRight: Radius.circular(20),
-                        bottomLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(80),
+                        topRight: Radius.circular(40),
+                        bottomLeft: Radius.circular(40),
+                        bottomRight: Radius.circular(40),
                       ),
                       height: cardHeight,
                     ),
@@ -159,10 +158,10 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       iconColor: Colors.black,
                       textColor: Colors.black,
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
+                        topLeft: Radius.circular(40),
                         topRight: Radius.circular(40),
-                        bottomLeft: Radius.circular(80),
-                        bottomRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(40),
                       ),
                       height: cardHeight,
                     ),
@@ -208,10 +207,10 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       iconColor: Colors.black,
                       textColor: Colors.black,
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(80),
-                        topRight: Radius.circular(20),
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(10),
                         bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(20),
+                        bottomRight: Radius.circular(40),
                       ),
                       height: cardHeight,
                     ),
@@ -257,9 +256,9 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       iconColor: Colors.white,
                       textColor: Colors.white,
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(80),
-                        bottomLeft: Radius.circular(20),
+                        topLeft: Radius.circular(40),
+                        topRight: Radius.circular(40),
+                        bottomLeft: Radius.circular(40),
                         bottomRight: Radius.circular(40),
                       ),
                       height: cardHeight,
@@ -267,9 +266,9 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                     // Add more recentTransaction widgets as needed
                   ],
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -334,14 +333,14 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                   children: [
                     Text(
                       _controller.getDrawerTitle().toString(),
-                      style: TextStyle(color: Colors.black, letterSpacing: 2),
+                      style: TextStyle(color: Colors.white, letterSpacing: 2),
                     ),
                     SizedBox(
                       height: 5,
                     ),
                     Text(
                       _controller.getDrawerSubTitle().toString(),
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.white),
                     )
                   ],
                 ),
@@ -421,27 +420,31 @@ class recentTransaction extends StatelessWidget {
             borderRadius: borderRadius,
             ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
                 icon,
                 size: 50,color: textColor,
               ),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      myCrypto,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16, color: textColor),
-                    ),
-                  ],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    count,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: textColor),
+                  ),
+                  Text(
+                    myCrypto,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: textColor),
+                  ),
+                ],
               ),
             ],
           ),
