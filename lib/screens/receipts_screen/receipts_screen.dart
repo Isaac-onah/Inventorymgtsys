@@ -18,6 +18,7 @@ class ReceiptsScreen extends StatelessWidget {
     return ChangeNotifierProvider<FactureController>(
         create: (_) => FactureController()..getReceiptsByDate(currentdate!),
         child: Scaffold(
+          backgroundColor: Colors.black,
           appBar: AppBar(
             title: Text("Receipts"),
             flexibleSpace: Container(
@@ -52,18 +53,12 @@ class ReceiptsScreen extends StatelessWidget {
                     ? Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: DataTable(
-                            headingTextStyle: TextStyle(color: defaultColor),
-                            border:
-                                TableBorder.all(width: 1, color: Colors.grey),
-                            columns: [
-                              ...headertitles.map((e) => _build_header_item(e))
-                            ],
-                            rows: [
-                              ...controller.list_of_receipts
-                                  .map((e) => _build_Row(e, context)),
-                            ],
+                          child: Column(
+                            children: controller.list_of_receipts
+                                .map<Widget>((e) => _build_Row(e, context))
+                                .toList(),
                           ),
+
                         ),
                       )
                     : Expanded(
@@ -82,10 +77,27 @@ class ReceiptsScreen extends StatelessWidget {
   }
 
   _build_Row(FactureModel model, BuildContext context) {
-    return DataRow(cells: [
-      DataCell(Center(child: Text('#1-${model.id.toString()}'))),
-      DataCell(Text(model.price.toString())),
-      DataCell(Row(
+    return Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2C2C2C), // Dark background color
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child:  Column(children:[
+    Row(
+      children: [
+        Text('Receipt Number: ', style: TextStyle(color: Colors.white),),Text('#1-${model.id.toString()}', style: TextStyle(color: Colors.white, fontSize: 16),),
+      ],
+    ),
+    Row(
+      children: [
+        Text('Amount: ', style: TextStyle(color: Colors.white),),
+        Text('₦${model.price.toString()}', style: TextStyle(color: Colors.white,fontSize: 16, fontWeight: FontWeight.bold),),
+      ],
+    ),
+    Row(
+      mainAxisAlignment: MainAxisAlignment.end,
         children: [
           TextButton(
               onPressed: () async {
@@ -127,10 +139,9 @@ class ReceiptsScreen extends StatelessWidget {
                     print('error');
                   });
               },
-              child: Text("details", style: TextStyle(color: Colors.blue)))
-        ],
-      )),
-    ]);
+              child: Text("View Details", style: TextStyle(color: Colors.green)))
+        ]),]
+      ),);
   }
 
   _build_header_item(String headerTitle) => DataColumn(
@@ -161,7 +172,7 @@ class ReceiptsScreen extends StatelessWidget {
             Expanded(
                 flex: 1,
                 child: Text(
-                  '${double.parse(model.price.toString()) * double.parse(model.qty.toString())}',
+                  '₦${double.parse(model.price.toString()) * double.parse(model.qty.toString())}',
                   style: TextStyle(fontSize: 12),
                 )),
           ],
@@ -201,7 +212,7 @@ class ReceiptsScreen extends StatelessWidget {
         Expanded(child: Container(), flex: 1),
         Expanded(
             child: Text(
-              price,
+              '₦$price',
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
             flex: 1),

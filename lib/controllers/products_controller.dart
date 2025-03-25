@@ -16,6 +16,13 @@ class ProductsController extends ChangeNotifier {
   List<ProductModel> _original_List_Of_product = [];
 
   bool isloadingGetProducts = false;
+  double _totalAmountSold = 0;
+  int _totalItemsSold = 0;
+  double get totalAmountSold => _totalAmountSold;
+  int get totalItemsSold => _totalItemsSold;
+  ProductsController() {
+    getTotalSalesData();
+  }
 
   Future<List<ProductModel>> getAllProduct() async {
     isloadingGetProducts = true;
@@ -328,6 +335,8 @@ class ProductsController extends ChangeNotifier {
         newqty = int.parse(productModel.qty.toString()) -
             int.parse(element.qty.toString());
 
+
+
 // NOTE  updated each product in my store depend on basket items
       await dbm.rawUpdate("update products set qty=? where barcode=?",
           ['$newqty', '${element.barcode}']).then((value) async {
@@ -342,8 +351,20 @@ class ProductsController extends ChangeNotifier {
         });
       });
     });
-  }
 
+
+  }
+  Future<void> getTotalSalesData() async {
+    var dbm = await marketdb.database;
+
+    await dbm.rawQuery("SELECT SUM(qty) as totalItems, SUM(price) as totalAmount FROM detailsfacture").then((value) {
+      if (value.isNotEmpty) {
+        _totalItemsSold = int.tryParse(value[0]['totalItems'].toString()) ?? 0;
+        _totalAmountSold = double.tryParse(value[0]['totalAmount'].toString()) ?? 0.0;
+      }
+      notifyListeners(); // Notify the UI to rebuild
+    });
+  }
   //NOTE auto complete search for a product
   Future<List<ProductModel>> autocomplete_Search_forProduct(
       String value) async {
@@ -370,3 +391,6 @@ class ProductsController extends ChangeNotifier {
     await dbm.rawDelete("DELETE FROM detailsfacture");
   }
 }
+
+
+

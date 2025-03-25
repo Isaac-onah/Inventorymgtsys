@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:myinventory/controllers/auth_controller.dart';
 import 'package:myinventory/controllers/facture_controller.dart';
+import 'package:myinventory/controllers/products_controller.dart';
 import 'package:myinventory/models/details_facture.dart';
 import 'package:myinventory/screens/home/total_wallet_balance.dart';
 import 'package:myinventory/screens/receipts_screen/receipts_screen.dart';
@@ -28,7 +29,6 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final double cardHeight = 180;
-    final double spacing = 12;
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -38,18 +38,22 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
             physics: BouncingScrollPhysics(),
             child: Column(
               children: [
+                const SizedBox(height:65),
                 Consumer<AuthController>(builder: (context, controller, child) {
                   return _myDrawer(controller, context);
                 }),
-                const SizedBox(height: 25),
-                TotalWalletBalance(
-                  context: context,
-                  totalBalance: '\$39.584',
-                  crypto: "7.251332 BTC",
-                  percentage: 3.55,
+                const SizedBox(height: 45),
+                Consumer<ProductsController>(
+                  builder: (context, controller, child) {
+                    return TotalWalletBalance(
+                      context: context,
+                      totalBalance: '₦${controller.totalAmountSold.toStringAsFixed(2)}', // Display in Naira // Show total items sold
+                      percentage: 3.55, // Keep percentage if needed
+                    );
+                  },
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 45,
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 25),
@@ -102,8 +106,6 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       },
                       icondata: Iconsax.receipt,
                       myCrypto: 'Receipts',
-                      count: '260',
-                      label: 'Stock',
                       icon: LucideIcons.box,
                       backgroundColor: const Color(0xFF2C2C2E),
                       iconColor: Colors.white,
@@ -151,110 +153,10 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       },
                       icondata: Iconsax.calendar,
                       myCrypto: 'Daily \nTransactions',
-                      count: '260',
-                      label: 'Categories',
                       icon: LucideIcons.shapes,
                       backgroundColor: const Color(0xFF387F36),
                       iconColor: Colors.black,
                       textColor: Colors.black,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40),
-                        bottomLeft: Radius.circular(10),
-                        bottomRight: Radius.circular(40),
-                      ),
-                      height: cardHeight,
-                    ),
-                    recentTransaction(
-                      ontap: () {
-                        datecontroller.clear();
-                        showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.parse('2022-01-01'),
-                          lastDate: DateTime.parse('2040-01-01'),
-                        ).then((value) async {
-                          if (value != null) {
-                            var selectedDate = value.toString().split(' ')[0];
-                            try {
-                              await context
-                                  .read<FactureController>()
-                                  .getReportByDate(selectedDate)
-                                  .then((value) {
-                                // print(value.length.toString());
-                                _openReportByDateOrBetween(value, selectedDate);
-                              });
-                            } catch (e) {
-                              showToast(
-                                message: "Error getting report: $e",
-                                status: ToastStatus.Error,
-                              );
-                            }
-                          } else {
-                            showToast(
-                              message: "Date must not be empty or null",
-                              status: ToastStatus.Error,
-                            );
-                          }
-                        });
-                      },
-                      icondata: Iconsax.calendar,
-                      myCrypto: 'Daily \nTransactions',
-                      count: '40',
-                      label: 'Receipt',
-                      icon: LucideIcons.fileText,
-                      backgroundColor: const Color(0xFF387F36),
-                      iconColor: Colors.black,
-                      textColor: Colors.black,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(10),
-                        bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(40),
-                      ),
-                      height: cardHeight,
-                    ),
-                    recentTransaction(
-                      ontap: () {
-                        datecontroller.clear();
-                        showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.parse('2022-01-01'),
-                          lastDate: DateTime.parse('2040-01-01'),
-                        ).then((value) async {
-                          if (value != null) {
-                            var selectedDate = value.toString().split(' ')[0];
-                            try {
-                              await context
-                                  .read<FactureController>()
-                                  .getReportByDate(selectedDate)
-                                  .then((value) {
-                                // print(value.length.toString());
-                                _openReportByDateOrBetween(value, selectedDate);
-                              });
-                            } catch (e) {
-                              showToast(
-                                message: "Error getting report: $e",
-                                status: ToastStatus.Error,
-                              );
-                            }
-                          } else {
-                            showToast(
-                              message: "Date must not be empty or null",
-                              status: ToastStatus.Error,
-                            );
-                          }
-                        });
-                      },
-                      icondata: Iconsax.calendar,
-                      myCrypto: 'Daily \nTransactions',
-                      count: '260',
-                      label: 'Transactions',
-                      icon: LucideIcons.calendar,
-                      backgroundColor: const Color(0xFF2C2C2E),
-                      iconColor: Colors.white,
-                      textColor: Colors.white,
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(40),
                         topRight: Radius.circular(40),
@@ -280,6 +182,37 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        GestureDetector(
+          onTap: () async {
+            if (currentuser != null) {
+              await _controller.google_signOut();
+            }
+          },
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Sign Out',
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              if (_controller.isloadingLogin)
+                CircularProgressIndicator(
+                  color: Colors.white,
+                ),
+            ],
+          ),
+        ),
+        SizedBox(
+          height: 20,
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -386,8 +319,6 @@ class recentTransaction extends StatelessWidget {
     required this.icondata,
     required this.myCrypto,
     required this.ontap,
-    required this.count,
-    required this.label,
     required this.icon,
     required this.backgroundColor,
     required this.iconColor,
@@ -398,8 +329,6 @@ class recentTransaction extends StatelessWidget {
   final IconData icondata;
   final String myCrypto;
   final VoidCallback ontap;
-  final String count;
-  final String label;
   final IconData icon;
   final Color backgroundColor;
   final Color iconColor;
@@ -434,11 +363,6 @@ class recentTransaction extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    count,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: textColor),
-                  ),
                   Text(
                     myCrypto,
                     textAlign: TextAlign.center,

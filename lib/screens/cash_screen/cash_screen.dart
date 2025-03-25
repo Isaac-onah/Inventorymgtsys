@@ -16,7 +16,10 @@ class CashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     text_receivedController.text = total_amount.toString();
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.black,
         title: Text("Cash"),
       ),
       body: Padding(
@@ -26,7 +29,7 @@ class CashScreen extends StatelessWidget {
             children: [
               Text(
                 "$total_amount",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
               ),
               SizedBox(
                 height: 10,
@@ -47,16 +50,49 @@ class CashScreen extends StatelessWidget {
                 "Cash Received",
                 style: TextStyle(color: Colors.green.shade300),
               ),
-              defaultTextFormField(
-                  inputtype: TextInputType.phone,
+              TextFormField(
+                  keyboardType: TextInputType.phone,
                   controller: text_receivedController,
+
+
+                style: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    color: Colors.white
+                ),
+                decoration: InputDecoration(
+                  fillColor: Color(0xFF24272E),
+                  contentPadding: EdgeInsets.symmetric(
+                    vertical: 14, // your height variable
+                    horizontal: 12, // your width variable
+                  ),
+                  filled: true, // your color variable
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    borderSide: BorderSide(
+                      color: Color(0xFF387F36), // your color
+                    ),
+                  ),
+                  labelText: 'Amount', // Pass the label text here
+                  labelStyle: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Roboto',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                  ),
                   suffixIcon: IconButton(
                     icon: Icon(Icons.close),
                     onPressed: () {
                       text_receivedController.clear();
                     },
                   ),
-                  border: UnderlineInputBorder()),
+                  hintText: "Amount...",
+
+                ),
+              ),
             ],
           ),
           SizedBox(

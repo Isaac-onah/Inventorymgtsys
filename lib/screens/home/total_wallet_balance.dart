@@ -5,13 +5,11 @@ class TotalWalletBalance extends StatelessWidget {
     super.key,
     required this.context,
     required this.totalBalance,
-    required this.crypto,
     required this.percentage,
   });
 
   final BuildContext context;
   final String totalBalance;
-  final crypto;
   final percentage;
 
   @override

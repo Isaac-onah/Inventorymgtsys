@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:myinventory/screens/home/homeScreens.dart';
 import 'package:myinventory/screens/manage_products/manage_products.dart';
-import 'package:myinventory/screens/printer_settings/printer_settings_screen.dart';
-import 'package:myinventory/screens/reports/reports_screen.dart';
 import 'package:myinventory/screens/salesScreen/sales_screen.dart';
 
 class LayoutController extends ChangeNotifier {
@@ -13,24 +11,20 @@ class LayoutController extends ChangeNotifier {
     BottomNavigationBarItem(
         icon: Icon(Iconsax.scan_barcode), label: "Scan QrCode"),
     // BottomNavigationBarItem(icon: Icon(Icons.report), label: "reports"),
-    BottomNavigationBarItem(
-        icon: Icon(Iconsax.printer), label: "Set Printer"),
   ];
 
   //NOTE: ---------------------------Screens and Titles----------------------------
-  final screens = [WalletHomeScreen(), ManageProductsScreen(), SalesScreen(), PrinterSettingScreen()]; // ReportsScreen()
+  final screens = [WalletHomeScreen(), ManageProductsScreen(), SalesScreen()]; // ReportsScreen()
 
   final appbar_title = [
     'Home',
     'Add Item',
     'Payment', /*'Report'*/
-    'Printer Configuration'
   ];
   final sub_appbar_title = [
     'Home',
     'View and add items',
     'Scan item for payment',
-    'Printer Configuration'
   ];
 
   // NOTE: --------------------- On Change Index Of Screens ------------------

@@ -25,7 +25,6 @@ class ManageProductsScreen extends StatelessWidget {
       backgroundColor: Colors.black,
       body: Consumer<ProductsController>(
         builder: (context, controller, child) {
-          print('manageScreen');
 
           if (controller.isloadingGetProducts) {
             return const Center(child: CircularProgressIndicator());
@@ -126,76 +125,6 @@ class ManageProductsScreen extends StatelessWidget {
           }),
     );
   }
-
-  _build_header_item(String headerTitle) => DataColumn(
-      label: Text(headerTitle,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          )));
-
-  _build_Row(ProductModel model, BuildContext context) => DataRow(cells: [
-        DataCell(Text(model.name.toString())),
-        DataCell(Text(model.barcode.toString())),
-        DataCell(Text(model.price.toString())),
-        DataCell(Text(model.qty.toString())),
-        DataCell(Row(
-          children: [
-            IconButton(
-              onPressed: () {
-                Get.to(() => EditProductScreen(model: model));
-              },
-              icon: Icon(
-                Icons.edit,
-              ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            IconButton(
-              onPressed: () {
-                var alertStyle =
-                    AlertStyle(animationDuration: Duration(milliseconds: 1));
-                Alert(
-                  style: alertStyle,
-                  context: context,
-                  type: AlertType.error,
-                  title: "Delete Item",
-                  desc: "Are You Sure You Want To Delete '${model.name}'",
-                  buttons: [
-                    DialogButton(
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      color: Colors.blue.shade400,
-                    ),
-                    DialogButton(
-                      child: Text(
-                        "Delete",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
-                      onPressed: () {
-                        Provider.of<ProductsController>(context, listen: false)
-                            .deleteProduct(model);
-                        Get.back();
-                      },
-                      color: Colors.red.shade400,
-                    ),
-                  ],
-                ).show();
-              },
-              icon: Icon(
-                Icons.delete,
-              ),
-            ),
-          ],
-        )),
-      ]);
 
 }
 // optional: for icons

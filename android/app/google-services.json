@@ -2,23 +2,23 @@
   "project_info": {
     "project_number": "941769297616",
     "project_id": "posservice-e14ae",
-    "storage_bucket": "posservice-e14ae.appspot.com"
+    "storage_bucket": "posservice-e14ae.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:941769297616:android:a0fe1f952b57944dcf98d5",
+        "mobilesdk_app_id": "1:941769297616:android:dc5d50a9f56fc961cf98d5",
         "android_client_info": {
           "package_name": "com.isaac.myinventory"
         }
       },
       "oauth_client": [
         {
-          "client_id": "941769297616-bsmug0n6o04tliau2p6f6e84qlnds15g.apps.googleusercontent.com",
+          "client_id": "941769297616-422q85h63p7bvvc4ggmfq8s7j4423mo8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.isaac.myinventory",
-            "certificate_hash": "de63bde055f439f29ac6d417e6968614ba48789e"
+            "certificate_hash": "5e5780025498f07b8d711a4a344beddf97814e99"
           }
         },
         {

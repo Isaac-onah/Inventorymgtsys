@@ -4,14 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
-import 'package:myinventory/controllers/printManagementController.dart';
 import 'package:myinventory/controllers/products_controller.dart';
 import 'package:myinventory/models/product.dart';
 import 'package:myinventory/screens/cash_screen/cash_screen.dart';
 import 'package:myinventory/screens/change_qty_screen/change_qty.dart';
 import 'package:myinventory/shared/components/default_button.dart';
 import 'package:myinventory/shared/constant.dart';
-import 'package:myinventory/shared/styles.dart';
 import 'package:myinventory/shared/toast_message.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
@@ -294,19 +292,6 @@ class _SellScreenState extends State<SalesScreen> {
                                 .toStringAsFixed(0);
                         _iscashSuccess = true;
                       });
-                      if (context
-                          .read<PrintManagementController>()
-                          .isprintautomatically) {
-                        // context.read<PrintManagementController>().printTicket(
-                        //     controller.basket_products,
-                        //     cash: _received_cash,
-                        //     change: _change_amount);
-                      } else {
-                        showToast(
-                          message: "enable switch button to print receipt",
-                          status: ToastStatus.Warning,
-                        );
-                      }
                     }
                   }),
             ),
@@ -394,14 +379,14 @@ class _SellScreenState extends State<SalesScreen> {
           children: [
             Text(
               "Total Price : ",
-              style: TextStyle(color: Colors.red[300], fontSize: 20),
+              style: TextStyle(color: Colors.green, fontSize: 20,),
             ),
             SizedBox(
               width: 10,
             ),
             Text(
               "₦" + controller.totalprice.toString(),
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             SizedBox(
               width: 10,

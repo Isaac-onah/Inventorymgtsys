@@ -3,13 +3,10 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:myinventory/controllers/auth_controller.dart';
-import 'package:myinventory/controllers/printManagementController.dart';
 import 'package:myinventory/controllers/products_controller.dart';
 import 'package:myinventory/layout/market_layout.dart';
 import 'package:myinventory/shared/constant.dart';
 import 'package:myinventory/shared/local/marketdb_helper.dart';
-import 'package:myinventory/shared/styles.dart';
-import 'package:myinventory/shared/toast_message.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -5,8 +7,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:myinventory/controllers/auth_controller.dart';
 import 'package:myinventory/controllers/facture_controller.dart';
 import 'package:myinventory/controllers/layout_controller.dart';
-import 'package:myinventory/controllers/printManagementController.dart';
 import 'package:myinventory/controllers/products_controller.dart';
+import 'package:myinventory/firebase_options.dart';
 import 'package:myinventory/screens/splash_screen/splash_screen.dart';
 import 'package:myinventory/shared/constant.dart';
 import 'package:myinventory/shared/local/cash_helper.dart';
@@ -24,8 +26,16 @@ Future<void> main() async {
   // Initialize the locale data
   await initializeDateFormatting('en_US', null);
 
-  await Firebase.initializeApp();
-
+  if (Platform.isAndroid) {
+    await Firebase.initializeApp(
+      name: 'driver',
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } else if (Platform.isIOS) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
   await CashHelper.init();
 
   currentuser = await CashHelper.getUser() ?? null;
@@ -42,8 +52,6 @@ Future<void> main() async {
       ChangeNotifierProvider<FactureController>(
           create: (_) => FactureController()),
       ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
-      ChangeNotifierProvider<PrintManagementController>(
-          create: (_) => PrintManagementController()),
     ],
     child: MyApp(),
   ));
