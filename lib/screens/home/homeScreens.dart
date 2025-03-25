@@ -30,7 +30,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     final double cardHeight = 180;
     final double spacing = 12;
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.black,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18.0),
         child: Column(

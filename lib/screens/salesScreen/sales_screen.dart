@@ -64,6 +64,7 @@ class _SellScreenState extends State<SalesScreen> {
 
 
     return Scaffold(
+      backgroundColor: Colors.black,
       body: prod_controller.isloadingGetProducts
           ? Center(child: CircularProgressIndicator())
           : _iscashSuccess
@@ -71,7 +72,7 @@ class _SellScreenState extends State<SalesScreen> {
                   alignment: Alignment.center,
                   child: Container(
                     width: double.infinity,
-                    color: defaultColor.shade300,
+                    color: Colors.black,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -198,7 +199,7 @@ class _SellScreenState extends State<SalesScreen> {
                       Align(
                         alignment: Alignment.center,
                         child: Container(
-                          color: Colors.white,
+                          color: Colors.black,
                           child: Column(
                             children: [
                               Padding(
@@ -229,11 +230,6 @@ class _SellScreenState extends State<SalesScreen> {
                                               0
                                           ? Column(
                                               children: [
-                                                _build_basket_header(),
-                                                Divider(
-                                                  thickness: 2,
-                                                  color: defaultColor,
-                                                ),
                                                 Expanded(
                                                   child: ListView(
                                                     children: [
@@ -250,9 +246,8 @@ class _SellScreenState extends State<SalesScreen> {
                                 ),
                               ),
                               _buildTotalPrice(prod_controller),
-                              Container(
+                              SizedBox(
                                 height: 10,
-                                color: Colors.white,
                               ),
                               _buildSubmitRow(prod_controller),
                             ],
@@ -266,7 +261,8 @@ class _SellScreenState extends State<SalesScreen> {
 
   _buildSubmitRow(ProductsController controller) => Container(
         width: double.infinity,
-        color: Colors.white,
+
+    color: Colors.black,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -392,7 +388,7 @@ class _SellScreenState extends State<SalesScreen> {
   }
 
   _buildTotalPrice(ProductsController controller) => Container(
-        color: Colors.white,
+    color: Colors.black,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -424,7 +420,7 @@ class _SellScreenState extends State<SalesScreen> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(6),
-            color: Colors.white,
+            color: Colors.black,
           ),
           width: MediaQuery.of(context).size.width * 0.4,
           padding: EdgeInsets.all(10),
@@ -467,6 +463,7 @@ class _SellScreenState extends State<SalesScreen> {
                             .style
                             .copyWith(fontStyle: FontStyle.italic),
                         decoration: InputDecoration(
+                          fillColor: Color(0xFF24272E),
                           contentPadding: EdgeInsets.symmetric(
                             vertical: 14, // your height variable
                             horizontal: 12, // your width variable
@@ -498,10 +495,10 @@ class _SellScreenState extends State<SalesScreen> {
                       // },
                       itemBuilder: (context, suggestion) {
                         return ListTile(
-                          //leading: Icon(Icons.shopping_cart),
+                          leading: Icon(Icons.shopping_cart),
                           title: Text(
                               (suggestion as ProductModel).name.toString()),
-                          subtitle: Text('${suggestion.price.toString()} LL'),
+                          subtitle: Text('₦ ${suggestion.price.toString()}'),
                         );
                       },
                       onSelected: (Object? suggestion) async {
@@ -527,72 +524,19 @@ class _SellScreenState extends State<SalesScreen> {
       );
 
   _basket_item(ProductModel model) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 4,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                model.name.toString(),
-                overflow: TextOverflow.ellipsis,
-              ),
-              SizedBox(
-                height: 4,
-              ),
-              Text(
-                " ₦ " + model.price.toString(),
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-        ),
-        Expanded(
-            child: GestureDetector(
-          onTap: () {
-            print("name " + model.name.toString());
-            Get.to(ChangeQtyScreen(
-                title: model.name.toString(),
-                barcode: model.barcode.toString(),
-                qty: model.qty.toString().trim()));
-          },
-          child: Text(
-            "${model.qty}",
-            style: TextStyle(
-                fontSize: 15,
-                color: defaultColor,
-                decoration: TextDecoration.underline),
-          ),
-        )),
-        Expanded(
-            child: IconButton(
-                onPressed: () {
-                  context
-                      .read<ProductsController>()
-                      .deleteProductFromBasket(model.barcode.toString());
-                },
-                icon: Icon(Icons.close))),
-      ],
+    return ProductCard(
+      productName: model.name.toString(),
+      unitPrice: int.parse(model.price),
+      quantity: int.parse(model.qty),
+      onDelete: () {
+        context.read<ProductsController>().deleteProductFromBasket(model.barcode.toString());
+      }, changeQuatity: () {
+                Get.to(ChangeQtyScreen(
+                    title: model.name.toString(),
+                    barcode: model.barcode.toString(),
+                    qty: model.qty.toString().trim()));
+    },
     );
   }
 
-  _build_basket_header() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 3,
-          child: Text(
-            "Name",
-            style: headerProductTable.copyWith(color: defaultColor),
-          ),
-        ),
-        Expanded(
-            child: Text("Qty",
-                style: headerProductTable.copyWith(color: defaultColor))),
-        Expanded(child: Text("")),
-      ],
-    );
-  }
 }

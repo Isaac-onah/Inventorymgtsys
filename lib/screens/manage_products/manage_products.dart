@@ -22,6 +22,7 @@ class ManageProductsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       body: Consumer<ProductsController>(
         builder: (context, controller, child) {
           print('manageScreen');
@@ -70,6 +71,45 @@ class ManageProductsScreen extends StatelessWidget {
                     barcode: product.barcode ?? 'No Barcode',
                     stock: int.tryParse(product.qty) ?? 0,
                     isInStock: (int.tryParse(product.qty) ?? 0) > 0,
+                    editProcess:(){
+                      Get.to(() => EditProductScreen(model: product));
+                    },
+                    deleteProcess: (){
+
+                      var alertStyle =
+                      AlertStyle(animationDuration: Duration(milliseconds: 1));
+                      Alert(
+                        style: alertStyle,
+                        context: context,
+                        type: AlertType.error,
+                        title: "Delete Item",
+                        desc: "Are You Sure You Want To Delete '${product.name}'",
+                        buttons: [
+                          DialogButton(
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            color: Colors.blue.shade400,
+                          ),
+                          DialogButton(
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                            onPressed: () {
+                              Provider.of<ProductsController>(context, listen: false)
+                                  .deleteProduct(product);
+                              Get.back();
+                            },
+                            color: Colors.red.shade400,
+                          ),
+                        ],
+                      ).show();
+                    },
                   ),
                 );
               },
@@ -164,6 +204,8 @@ class ProductCard extends StatelessWidget {
   final String barcode;
   final int stock;
   final bool isInStock;
+  final VoidCallback editProcess;
+  final VoidCallback deleteProcess;
 
   const ProductCard({
     Key? key,
@@ -171,6 +213,8 @@ class ProductCard extends StatelessWidget {
     required this.barcode,
     required this.stock,
     this.isInStock = true,
+    required this.editProcess,
+    required this.deleteProcess,
   }) : super(key: key);
 
   @override
@@ -250,9 +294,7 @@ class ProductCard extends StatelessWidget {
             children: [
               // Edit Button
               GestureDetector(
-                onTap: () {
-                  // Handle edit action
-                },
+                onTap: editProcess,
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
@@ -269,9 +311,7 @@ class ProductCard extends StatelessWidget {
               const SizedBox(height: 8),
               // Delete Button
               GestureDetector(
-                onTap: () {
-                  // Handle delete action
-                },
+                onTap: deleteProcess,
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(

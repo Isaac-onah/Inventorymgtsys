@@ -6,7 +6,7 @@ Widget defaultButton(
         Color background = Colors.green,
         VoidCallback? onpress,
         required String text,
-        double radius = 0,
+        double radius = 10,
         double height = 40,
         LinearGradient? gradient,
         bool? isUppercase}) =>

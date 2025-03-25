@@ -13,6 +13,7 @@ class MarketLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     var controller = Provider.of<LayoutController>(context);
     return Scaffold(
+      backgroundColor:Colors.black,
       appBar: controller.currentIndex == 0
           ? null
           : AppBar(
@@ -38,17 +39,20 @@ class MarketLayout extends StatelessWidget {
       ),
 
       body: controller.screens[controller.currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        elevation: 30,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: defaultColor,
-        onTap: (index) {
-          print(index);
-
-          controller.onchangeIndex(index);
-        },
-        currentIndex: controller.currentIndex,
-        items: controller.bottomItems,
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: BottomNavigationBar(
+          backgroundColor:Colors.black,
+          elevation: 30,
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: defaultColor,
+          unselectedItemColor: Colors.white,
+          onTap: (index) {
+            controller.onchangeIndex(index);
+          },
+          currentIndex: controller.currentIndex,
+          items: controller.bottomItems,
+        ),
       ),
     );
   }

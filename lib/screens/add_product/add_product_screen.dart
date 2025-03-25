@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:myinventory/controllers/products_controller.dart';
 import 'package:myinventory/models/product.dart';
 import 'package:myinventory/shared/components/default_button.dart';
-import 'package:myinventory/shared/components/default_text_form.dart';
 import 'package:myinventory/shared/constant.dart';
 import 'package:myinventory/shared/toast_message.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +51,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         flexibleSpace: Container(
         color: Colors.green,
@@ -68,20 +68,20 @@ class _AddProductScreenState extends State<AddProductScreen> {
               child: _buildControlButton(),
             ),
           if (!is_onScan)
-            Container(
-              color: Colors.white,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _build_Form(context),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    _buildSubmitRow(context),
-                  ],
-                ),
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _build_Form(context),
+                  SizedBox(
+                    height: 35,
+                  ),
+                  _buildSubmitRow(context),
+                  SizedBox(
+                    height: 35,
+                  ),
+                ],
               ),
             ),
         ],
@@ -136,7 +136,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return Form(
         key: _formkey,
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20),
           child: Column(
             children: [
               TextFormField(
@@ -149,7 +149,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   // readonly: context.read<ProductsController>().isProductExist
                   //     ? true
                   //     : false,
+
                   decoration: InputDecoration(
+                    fillColor: Color(0xFF24272E),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 14, // your height variable
                       horizontal: 12, // your width variable
@@ -167,7 +169,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     labelText: 'Barcode', // Pass the label text here
                     labelStyle: TextStyle(
-                      color: Color(0xFF387F36),
+                      color: Colors.white,
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
@@ -180,11 +182,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             is_onScan = true;
                           });
                         },
-                        icon: Icon(Icons.qr_code_scanner)),
+                        icon: Icon(Icons.qr_code_scanner,color:Color(0xFF387F36) ,)),
                   ),
                   controller: productbarcodeController_text),
               SizedBox(
-                height: 5,
+                height: 15,
               ),
              TextFormField(
                   validator: (value) {
@@ -197,6 +199,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       ? true
                       : false,
                  decoration: InputDecoration(
+                   fillColor: Color(0xFF24272E),
                    contentPadding: EdgeInsets.symmetric(
                      vertical: 14, // your height variable
                      horizontal: 12, // your width variable
@@ -214,7 +217,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                    ),
                    labelText: 'Name', // Pass the label text here
                    labelStyle: TextStyle(
-                     color: Color(0xFF387F36),
+                     color: Colors.white,
                      fontFamily: 'Roboto',
                      fontWeight: FontWeight.w400,
                      fontSize: 16,
@@ -223,81 +226,91 @@ class _AddProductScreenState extends State<AddProductScreen> {
                  ),
                   controller: productNameController_text),
               SizedBox(
-                height: 5,
+                height: 15,
               ),
-              TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Price must not be empty";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 14, // your height variable
-                      horizontal: 12, // your width variable
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Price must not be empty";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          fillColor: Color(0xFF24272E),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 14, // your height variable
+                            horizontal: 12, // your width variable
+                          ),
+                          filled: true, // your color variable
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF387F36), // your color
+                            ),
+                          ),
+                          labelText: 'Price per item...', // Pass the label text here
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                          ),
+                          hintText: "Price per item...",
+                        ),
+                        controller: productPriceController_text
                     ),
-                    filled: true, // your color variable
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(
-                        color: Color(0xFF387F36), // your color
-                      ),
-                    ),
-                    labelText: 'Price per item...', // Pass the label text here
-                    labelStyle: TextStyle(
-                      color: Color(0xFF387F36),
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                    ),
-                    hintText: "Price per item...",
                   ),
-                  controller: productPriceController_text
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return "Qty must not be empty";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          fillColor: Color(0xFF24272E),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: 14, // your height variable
+                            horizontal: 12, // your width variable
+                          ),
+                          filled: true, // your color variable
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                            borderSide: BorderSide(
+                              color: Color(0xFF387F36), // your color
+                            ),
+                          ),
+                          labelText: 'qty...', // Pass the label text here
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                          ),
+                          hintText: "qty...",
+                        ),
+                        keyboardType: TextInputType.phone,
+                        controller: productQtyController),
+                  ),
+                ],
               ),
               SizedBox(
-                height: 5,
-              ),
-              TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Qty must not be empty";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 14, // your height variable
-                      horizontal: 12, // your width variable
-                    ),
-                    filled: true, // your color variable
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(
-                        color: Color(0xFF387F36), // your color
-                      ),
-                    ),
-                    labelText: 'qty...', // Pass the label text here
-                    labelStyle: TextStyle(
-                      color: Color(0xFF387F36),
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                    ),
-                    hintText: "qty...",
-                  ),
-                  keyboardType: TextInputType.phone,
-                  controller: productQtyController),
-              SizedBox(
-                height: 5,
+                height: 15,
               ),
               TextFormField(
                   validator: (value) {
@@ -307,6 +320,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     return null;
                   },
                   decoration: InputDecoration(
+                    fillColor: Color(0xFF24272E),
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 14, // your height variable
                       horizontal: 12, // your width variable
@@ -324,7 +338,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     labelText: 'Total Price...', // Pass the label text here
                     labelStyle: TextStyle(
-                      color: Color(0xFF387F36),
+                      color: Colors.white,
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
@@ -342,7 +356,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return Wrap(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          padding: const EdgeInsets.symmetric(horizontal: 25.0),
           child: defaultButton(
               //width: MediaQuery.of(context).size.width * 0.4,
               text: "Save",
