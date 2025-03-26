@@ -21,7 +21,7 @@ workflows:
           storePassword=$KEYSTORE_PASSWORD
           keyPassword=$KEYSTORE_KEY_PASSWORD
           keyAlias=myinventory
-          storeFile=app/myinventory_keystore.jks
+          storeFile=myinventory_keystore.jks
           EOF
       - name: Build AAB
         script: |
