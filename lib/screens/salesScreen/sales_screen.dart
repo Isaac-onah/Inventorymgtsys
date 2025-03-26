@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
 import 'package:myinventory/controllers/products_controller.dart';
@@ -354,7 +353,6 @@ class _SellScreenState extends State<SalesScreen> {
 
     qrViewcontroller?.scannedDataStream.listen((barcode) => setState(() {
           this.barCode = barcode;
-          FlutterBeep.beep();
           is_onScan = false;
           qrViewcontroller?.pauseCamera();
 
