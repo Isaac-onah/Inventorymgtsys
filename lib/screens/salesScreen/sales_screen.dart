@@ -1,8 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:myinventory/controllers/products_controller.dart';
 import 'package:myinventory/models/product.dart';
 import 'package:myinventory/screens/cash_screen/cash_screen.dart';
@@ -19,34 +19,27 @@ class SalesScreen extends StatefulWidget {
 }
 
 class _SellScreenState extends State<SalesScreen> {
-  List<String> headertitles = ['Name', 'Qty', ''];
   final qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? qrViewcontroller;
-  Barcode? barCode = null;
+  Barcode? barCode;
   bool is_onScan = false;
-  bool isflashOn = true;
+  bool isflashOn = false;
+  bool isCashSuccess = false;
 
-  var qtyController = TextEditingController();
-  var receivedCashController = TextEditingController();
+  String changeAmount = "";
+  String totalPaid = "";
+  String receivedCash = "";
 
-  bool _iscashSuccess = false;
-
-  var text_productNameController = TextEditingController();
-  var text_barcode_controller = TextEditingController();
-
-  GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-
-  String _change_amount = "";
-  String _total_paid = "";
-  String _received_cash = "";
+  final text_productNameController = TextEditingController();
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    this.qrViewcontroller?.dispose();
+    qrViewcontroller?.dispose();
+    text_productNameController.dispose();
     super.dispose();
   }
 
+  @override
   void reassemble() async {
     super.reassemble();
     if (Platform.isAndroid) {
@@ -59,467 +52,334 @@ class _SellScreenState extends State<SalesScreen> {
   Widget build(BuildContext context) {
     var prod_controller = Provider.of<ProductsController>(context);
 
-
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.grey[50],
       body: prod_controller.isloadingGetProducts
-          ? Center(child: CircularProgressIndicator())
-          : _iscashSuccess
-              ? Align(
-                  alignment: Alignment.center,
-                  child: Container(
-                    width: double.infinity,
-                    color: Colors.black,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Column(
-                              children: [
-                                Text(
-                                  "${_received_cash}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 30),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "Received",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 25),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: Column(
-                              children: [
-                                Text(
-                                  "${_total_paid}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 25),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "Total paid",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 15),
-                                ),
-                              ],
-                            )),
-                            Container(
-                                height: 80,
-                                child: VerticalDivider(
-                                  color: Colors.white,
-                                  thickness: 2,
-                                )),
-                            Expanded(
-                                child: Column(
-                              children: [
-                                Text(
-                                  "${_change_amount}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.red.shade400,
-                                      fontSize: 25),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "Change",
-                                  style: TextStyle(
-                                      color: Colors.red.shade400, fontSize: 15),
-                                ),
-                              ],
-                            ))
-                          ],
-                        ),
-                        SizedBox(
-                          height: 25,
-                        ),
-                        CircleAvatar(
-                          backgroundColor: Colors.white,
-                          radius: 50,
-                          child: Icon(
-                            Icons.done,
-                            size: 50,
-                            color: defaultColor,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text("Completed!",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                        Text(
-                          "Transaction was Completed successfully",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        SizedBox(
-                          height: 50,
-                        ),
-                        _continueButton(),
-                      ],
-                    ),
-                  ),
-                )
-              : Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    if (is_onScan) _buildQr(context),
-                    // Positioned(
-                    //   bottom: 10,
-                    //   child: _buildResult(),
-                    // ),
-                    if (is_onScan)
-                      Positioned(
-                        top: 10,
-                        child: _buildControlButton(),
-                      ),
-                    if (!is_onScan)
-                      Align(
-                        alignment: Alignment.center,
-                        child: Container(
-                          color: Colors.black,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 15.0, vertical: 5),
-                                child: Row(
-                                  children: [
-                                    Expanded(child: _builddropdownSearch()),
-                                    IconButton(
-                                        onPressed: () {
-                                          qrViewcontroller?.resumeCamera();
-                                          setState(() {
-                                            is_onScan = true;
-                                          });
-                                        },
-                                        icon:
-                                            Icon(Icons.qr_code_scanner_rounded))
-                                  ],
-                                ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  width: double.infinity,
-                                  child: Padding(
-                                      padding: const EdgeInsets.all(15.0),
-                                      child: prod_controller
-                                                  .basket_products.length >
-                                              0
-                                          ? Column(
-                                              children: [
-                                                Expanded(
-                                                  child: ListView(
-                                                    children: [
-                                                      ...prod_controller
-                                                          .basket_products
-                                                          .map((e) =>
-                                                              _basket_item(e)),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                          : Container()),
-                                ),
-                              ),
-                              _buildTotalPrice(prod_controller),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              _buildSubmitRow(prod_controller),
-                            ],
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+          ? const Center(child: CircularProgressIndicator())
+          : isCashSuccess 
+            ? _buildSuccessView()
+            : is_onScan 
+              ? _buildScannerView()
+              : _buildMainView(prod_controller),
     );
   }
 
-  _buildSubmitRow(ProductsController controller) => Container(
-        width: double.infinity,
-
-    color: Colors.black,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: defaultButton(
-
-                  background: Colors.green,
-
-                  //  width: MediaQuery.of(context).size.width * 0.4,
-                  text: "Cash",
-                  onpress: () async {
-                    if (controller.basket_products.length > 0) {
-                      String total_price =
-                          controller.totalprice.toStringAsFixed(0).toString();
-                      String res =
-                          await Get.to(CashScreen(controller.totalprice));
-                      print("res :" + res.toString());
-
-                      // Print Receipt
-
-                      setState(() {
-                        _change_amount = double.parse(res).toStringAsFixed(0);
-                        _total_paid = total_price;
-                        _received_cash =
-                            (double.parse(total_price) + double.parse(res))
-                                .toStringAsFixed(0);
-                        _iscashSuccess = true;
-                      });
-                    }
-                  }),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-          ],
-        ),
-      );
-
-  _buildControlButton() => Row(
+  Widget _buildSuccessView() {
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          //  qrViewcontroller!.getFlashStatus() == true
-          IconButton(
-              onPressed: () {
-                qrViewcontroller!.getFlashStatus().then((value) {
-                  setState(() {
-                    isflashOn = value!;
-                  });
-                });
-                qrViewcontroller!.toggleFlash();
-              },
-              icon: Icon(
-                isflashOn ? Icons.flash_on : Icons.flash_off,
-                color: defaultColor,
-                size: 35,
-              )),
-          IconButton(
-              onPressed: () async {
-                await qrViewcontroller?.pauseCamera();
-                setState(() {
-                  is_onScan = false;
-                });
-              },
-              icon: Icon(
-                Icons.close,
-                color: defaultColor,
-                size: 35,
-              ))
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F9F0),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.check_circle, size: 80, color: Color(0xFF382959)),
+          ),
+          const SizedBox(height: 24),
+          const Text("Completed!", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Color(0xFF382959))),
+          const SizedBox(height: 8),
+          Text("Transaction processed successfully", style: TextStyle(color: Colors.grey[600], fontSize: 16)),
+          const SizedBox(height: 40),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Column(
+              children: [
+                _buildSummaryRow("Total Paid", totalPaid, isBold: true),
+                const Divider(height: 32),
+                _buildSummaryRow("Received", receivedCash),
+                const SizedBox(height: 12),
+                _buildSummaryRow("Change", changeAmount, color: Colors.redAccent),
+              ],
+            ),
+          ),
+          const SizedBox(height: 50),
+          SizedBox(
+            width: double.infinity,
+            height: 60,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF382959),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                elevation: 0,
+              ),
+              onPressed: () => setState(() => isCashSuccess = false),
+              child: const Text("New Transaction", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+          ),
         ],
-      );
-
-  _buildQr(BuildContext context) => QRView(
-        key: qrKey,
-        onQRViewCreated: onQRViewCreatedCallback,
-        overlay: QrScannerOverlayShape(
-            borderColor: defaultColor,
-            borderWidth: 7,
-            borderLength: 20,
-            borderRadius: 10,
-            cutOutSize: MediaQuery.of(context).size.width * 0.7),
-      );
-
-  void onQRViewCreatedCallback(QRViewController controller) {
-    setState(() {
-      this.qrViewcontroller = controller;
-      //this.context = context;
-    });
-
-    qrViewcontroller?.scannedDataStream.listen((barcode) => setState(() {
-          this.barCode = barcode;
-          is_onScan = false;
-          qrViewcontroller?.pauseCamera();
-
-          context
-              .read<ProductsController>()
-              .fetchProductBybarCode(barcode.code.toString())
-              .then((value) {
-            print(value);
-            if (!value)
-              showToast(
-                  message: "Item Not found",
-                  status: ToastStatus.Error,
-                  time: 4);
-          });
-        }));
+      ),
+    );
   }
 
-  _buildTotalPrice(ProductsController controller) => Container(
-    color: Colors.black,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              "Total Price : ",
-              style: TextStyle(color: Colors.green, fontSize: 20,),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Text(
-              "₦" + controller.totalprice.toString(),
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-          ],
+  Widget _buildSummaryRow(String label, String value, {Color? color, bool isBold = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.w500)),
+        Text(
+          "₦$value", 
+          style: TextStyle(
+            color: color ?? const Color(0xFF382959), 
+            fontSize: isBold ? 24 : 18, 
+            fontWeight: isBold ? FontWeight.w900 : FontWeight.bold
+          )
         ),
-      );
+      ],
+    );
+  }
 
-  _continueButton() => GestureDetector(
-        onTap: () {
-          setState(() {
-            _iscashSuccess = false;
-            is_onScan = false;
-          });
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            color: Colors.black,
+  Widget _buildScannerView() {
+    return Stack(
+      children: [
+        QRView(
+          key: qrKey,
+          onQRViewCreated: onQRViewCreatedCallback,
+          overlay: QrScannerOverlayShape(
+            borderColor: const Color(0xFF382959),
+            borderWidth: 8,
+            borderLength: 30,
+            borderRadius: 16,
+            cutOutSize: MediaQuery.of(context).size.width * 0.7,
           ),
-          width: MediaQuery.of(context).size.width * 0.4,
-          padding: EdgeInsets.all(10),
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-            Text(
-              'New sale',
-              style: TextStyle(color: defaultColor, letterSpacing: 2),
-            ),
-            Container(
-              child: Icon(Icons.navigate_next, color: Colors.white),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: defaultColor,
-              ),
-            ),
-          ]),
         ),
-      );
-
-  _builddropdownSearch() => Form(
-
-        key: _formkey,
-        child: SingleChildScrollView(
-          child: Column(
+        Positioned(
+          top: 50,
+          left: 20,
+          right: 20,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Stack(
-                alignment: Alignment.centerRight,
-                children: [
-                  Container(
-                    height: 50,
-                    child: TypeAheadField<ProductModel>(
-                      hideOnError: true,
-                      controller: text_productNameController,
-                      builder: (context, controller, focusNode) => TextField(
-                        controller: controller,
-                        focusNode: focusNode,
-                        autofocus: true,
-                        style: DefaultTextStyle.of(context)
-                            .style
-                            .copyWith(fontStyle: FontStyle.italic),
-                        decoration: InputDecoration(
-                          fillColor: Color(0xFF24272E),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 14, // your height variable
-                            horizontal: 12, // your width variable
-                          ),
-                          filled: true, // your color variable
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF387F36), // your color
-                            ),
-                          ),
-                          labelText: 'Select Product', // Pass the label text here
-                          labelStyle: TextStyle(
-                            color: Color(0xFF387F36),
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                          ),
-                          hintText: 'Select Product ...',
-                        ),
-                      ),
-                      // suggestionsCallback: (pattern) async {
-                      // return await marketController
-                      //     .autocomplete_Search_forProduct(pattern);
-                      // },
-                      itemBuilder: (context, suggestion) {
-                        return ListTile(
-                          leading: Icon(Icons.shopping_cart),
-                          title: Text(
-                              (suggestion as ProductModel).name.toString()),
-                          subtitle: Text('₦ ${suggestion.price.toString()}'),
-                        );
-                      },
-                      onSelected: (Object? suggestion) async {
-                        String? barcode =
-                            (suggestion as ProductModel).barcode.toString();
-                        await context
-                            .read<ProductsController>()
-                            .fetchProductBybarCode(barcode);
-                        text_productNameController.clear();
-                      },
-                      suggestionsCallback: (String pattern) async {
-                        return await context
-                            .read<ProductsController>()
-                            .autocomplete_Search_forProduct(pattern);
-                      },
-                    ),
-                  ),
-                ],
+              IconButton(
+                style: IconButton.styleFrom(backgroundColor: Colors.white24),
+                onPressed: () => setState(() => is_onScan = false),
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+              ),
+              IconButton(
+                style: IconButton.styleFrom(backgroundColor: Colors.white24),
+                onPressed: () {
+                  qrViewcontroller?.toggleFlash();
+                  setState(() => isflashOn = !isflashOn);
+                },
+                icon: Icon(isflashOn ? Icons.flash_on : Icons.flash_off, color: Colors.white, size: 28),
               ),
             ],
           ),
         ),
-      );
+      ],
+    );
+  }
 
-  _basket_item(ProductModel model) {
+  Widget _buildMainView(ProductsController prod_controller) {
+    return Column(
+      children: [
+        _buildHeader(),
+        Expanded(
+          child: prod_controller.basket_products.isNotEmpty
+              ? ListView.builder(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: prod_controller.basket_products.length,
+                  itemBuilder: (context, index) => _basket_item(prod_controller.basket_products[index]),
+                )
+              : Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Iconsax.shopping_cart, size: 80, color: Colors.grey[300]),
+                      const SizedBox(height: 16),
+                      Text("Basket is empty", style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+        ),
+        _buildCheckoutSection(prod_controller),
+      ],
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      child: Row(
+        children: [
+          Expanded(child: _builddropdownSearch()),
+          const SizedBox(width: 12),
+          InkWell(
+            onTap: () => setState(() => is_onScan = true),
+            child: Container(
+              height: 54,
+              width: 54,
+              decoration: BoxDecoration(
+                color: const Color(0xFF382959).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Icon(Iconsax.scan_barcode, color: Color(0xFF382959), size: 26),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCheckoutSection(ProductsController controller) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Total Price", style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.w500)),
+              Text(
+                "₦${controller.totalprice.toStringAsFixed(2)}",
+                style: const TextStyle(color: Color(0xFF382959), fontSize: 28, fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 60,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF382959),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                elevation: 0,
+              ),
+              onPressed: controller.basket_products.isEmpty ? null : () => _handleCheckout(controller),
+              child: const Text("Continue to Payment", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _handleCheckout(ProductsController controller) async {
+    double currentTotal = controller.totalprice;
+    dynamic res = await Get.to(() => CashScreen(controller.totalprice));
+    
+    if (res != null) {
+      double change = double.tryParse(res.toString()) ?? 0;
+      setState(() {
+        changeAmount = change.toStringAsFixed(0);
+        totalPaid = currentTotal.toStringAsFixed(0);
+        receivedCash = (currentTotal + change).toStringAsFixed(0);
+        isCashSuccess = true;
+      });
+    }
+  }
+
+  Widget _builddropdownSearch() {
+    return TypeAheadField<ProductModel>(
+      hideOnError: true,
+      controller: text_productNameController,
+      builder: (context, controller, focusNode) => TextField(
+        controller: controller,
+        focusNode: focusNode,
+        decoration: InputDecoration(
+          fillColor: Colors.grey[100],
+          filled: true,
+          hintText: 'Search product...',
+          hintStyle: TextStyle(color: Colors.grey[500]),
+          prefixIcon: Icon(Iconsax.search_normal, color: Colors.grey[400]),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        ),
+      ),
+      constraints: const BoxConstraints(maxHeight: 300),
+      decorationBuilder: (context, child) => Material(
+        type: MaterialType.card,
+        elevation: 8,
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        child: child,
+      ),
+      itemBuilder: (context, suggestion) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0F9F0),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Iconsax.box, color: Color(0xFF382959), size: 20),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(suggestion.name.toString(), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF382959))),
+                    Text('₦${suggestion.price.toString()}', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  ],
+                ),
+              ),
+              const Icon(Icons.add_circle_outline, color: Color(0xFF4CAF50), size: 20),
+            ],
+          ),
+        );
+      },
+      onSelected: (suggestion) async {
+        await context.read<ProductsController>().fetchProductBybarCode(suggestion.barcode.toString());
+        text_productNameController.clear();
+      },
+      suggestionsCallback: (pattern) async {
+        return await context.read<ProductsController>().autocomplete_Search_forProduct(pattern);
+      },
+    );
+  }
+
+  void onQRViewCreatedCallback(QRViewController controller) {
+    setState(() => qrViewcontroller = controller);
+    qrViewcontroller?.scannedDataStream.listen((barcode) {
+      if (is_onScan) {
+        setState(() {
+          barCode = barcode;
+          is_onScan = false;
+        });
+        qrViewcontroller?.pauseCamera();
+        context.read<ProductsController>().fetchProductBybarCode(barcode.code.toString()).then((value) {
+          if (!value) showToast(message: "Item Not found", status: ToastStatus.Error);
+        });
+      }
+    });
+  }
+
+  Widget _basket_item(ProductModel model) {
     return ProductCard(
       productName: model.name.toString(),
       unitPrice: int.parse(model.price),
       quantity: int.parse(model.qty),
       onDelete: () {
         context.read<ProductsController>().deleteProductFromBasket(model.barcode.toString());
-      }, changeQuatity: () {
-                Get.to(ChangeQtyScreen(
-                    title: model.name.toString(),
-                    barcode: model.barcode.toString(),
-                    qty: model.qty.toString().trim()));
-    },
+      },
+      changeQuatity: () {
+        Get.to(ChangeQtyScreen(
+          title: model.name.toString(),
+          barcode: model.barcode.toString(),
+          qty: model.qty.toString().trim(),
+        ));
+      },
     );
   }
-
 }

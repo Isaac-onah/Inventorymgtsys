@@ -1,307 +1,199 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:myinventory/controllers/products_controller.dart';
 import 'package:myinventory/models/product.dart';
-import 'package:myinventory/shared/components/default_button.dart';
-import 'package:myinventory/shared/components/default_text_form.dart';
-import 'package:myinventory/shared/constant.dart';
 import 'package:myinventory/shared/toast_message.dart';
 import 'package:provider/provider.dart';
 
-class EditProductScreen extends StatelessWidget {
-  ProductModel model;
-  EditProductScreen({required this.model});
+class EditProductScreen extends StatefulWidget {
+  final ProductModel model;
+  EditProductScreen({required this.model, super.key});
 
-  var productbarcodeController_text = TextEditingController();
-  var productNameController_text = TextEditingController();
-  var productPriceController_text = TextEditingController();
-  var productTotalPriceController_text = TextEditingController();
-  var productQtyController_text = TextEditingController();
-  var profitperitemcontroller_text = TextEditingController();
-  GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  @override
+  State<EditProductScreen> createState() => _EditProductScreenState();
+}
+
+class _EditProductScreenState extends State<EditProductScreen> {
+  late TextEditingController productbarcodeController_text;
+  late TextEditingController productNameController_text;
+  late TextEditingController productPriceController_text;
+  late TextEditingController productTotalPriceController_text;
+  late TextEditingController productQtyController_text;
+  late TextEditingController profitperitemcontroller_text;
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    productNameController_text = TextEditingController(text: widget.model.name.toString());
+    productbarcodeController_text = TextEditingController(text: widget.model.barcode.toString());
+    productPriceController_text = TextEditingController(text: widget.model.price.toString());
+    productTotalPriceController_text = TextEditingController(text: widget.model.totalprice.toString());
+    productQtyController_text = TextEditingController(text: widget.model.qty.toString());
+    profitperitemcontroller_text = TextEditingController(text: widget.model.profit_per_item.toString());
+  }
+
+  @override
+  void dispose() {
+    productNameController_text.dispose();
+    productbarcodeController_text.dispose();
+    productPriceController_text.dispose();
+    productTotalPriceController_text.dispose();
+    productQtyController_text.dispose();
+    profitperitemcontroller_text.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    productNameController_text.text = model.name.toString();
-    productbarcodeController_text.text = model.barcode.toString();
-    productPriceController_text.text = model.price.toString();
-    productQtyController_text.text = model.qty.toString();
-    profitperitemcontroller_text.text = model.profit_per_item.toString();
     var prod_controller = Provider.of<ProductsController>(context);
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: defaultColor,
-        title: Text("${model.name}"),
-        actions: [
-        ],
+        title: Text("Edit ${widget.model.name}", style: const TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Color(0xFF382959)),
       ),
-      body: _build_Form(),
-      bottomNavigationBar:
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18.0,vertical: 30),
-        child: defaultButton(
-          onpress: () {
-              if (_formkey.currentState!.validate()) {
-                int? price = int.tryParse(productPriceController_text.text);
-                int? qty = int.tryParse(productQtyController_text.text);
-                int? totalprice =
-                int.tryParse(productQtyController_text.text);
-                if (price != null && qty != null && totalprice != null) {
-                  print('QTY : ' + productQtyController_text.text.toString());
-                  String profit_per_item =
-                  ((qty * price - totalprice) / qty).toString();
-                  prod_controller
-                      .updateProduct(ProductModel(
-                      barcode: model.barcode,
-                      name: productNameController_text.text,
-                      price: productPriceController_text.text,
-                      totalprice: productTotalPriceController_text.text,
-                      qty: productQtyController_text.text,
-                      profit_per_item: profit_per_item))
-                      .then((value) {
-                    Get.back();
-                    showToast(
-                        message: prod_controller.statusUpdateBodyMessage,
-                        status: prod_controller.statusUpdateMessage);
-                  });
-                } else {
-                  showToast(
-                      message: "Price,Total Price Or Qty Must be a number ",
-                      status: ToastStatus.Error);
-                }
-              }
-            },
-            text:"Save",
-            ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Form(
+          key: _formkey,
+          child: Column(
+            children: [
+              _buildField(
+                label: "Barcode",
+                controller: productbarcodeController_text,
+                hint: "Barcode",
+                icon: Iconsax.scan_barcode,
+                enabled: false,
+              ),
+              const SizedBox(height: 20),
+              _buildField(
+                label: "Product Name",
+                controller: productNameController_text,
+                hint: "Enter product name",
+                icon: Iconsax.box,
+                validator: (v) => v!.isEmpty ? "Name is required" : null,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildField(
+                      label: "Selling Price",
+                      controller: productPriceController_text,
+                      hint: "0.00",
+                      icon: Iconsax.dollar_circle,
+                      keyboardType: TextInputType.number,
+                      validator: (v) => v!.isEmpty ? "Price required" : null,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildField(
+                      label: "Quantity",
+                      controller: productQtyController_text,
+                      hint: "0",
+                      icon: Iconsax.archive_1,
+                      keyboardType: TextInputType.number,
+                      validator: (v) => v!.isEmpty ? "Qty required" : null,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _buildField(
+                label: "Profit Per Item (Auto-calculated)",
+                controller: profitperitemcontroller_text,
+                hint: "0.00",
+                icon: Iconsax.status_up,
+                enabled: false,
+              ),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity,
+                height: 60,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF382959),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    elevation: 0,
+                  ),
+                  onPressed: () {
+                    if (_formkey.currentState!.validate()) {
+                      int? price = int.tryParse(productPriceController_text.text);
+                      int? qty = int.tryParse(productQtyController_text.text);
+                      // Fallback if totalprice was not populated
+                      int totalCost = int.tryParse(productTotalPriceController_text.text) ?? 
+                                     (int.tryParse(widget.model.totalprice ?? '0') ?? 0);
+                      
+                      if (price != null && qty != null) {
+                        String profit_per_item = ((qty * price - totalCost) / qty).toString();
+                        prod_controller.updateProduct(ProductModel(
+                          barcode: widget.model.barcode,
+                          name: productNameController_text.text,
+                          price: productPriceController_text.text,
+                          totalprice: totalCost.toString(),
+                          qty: productQtyController_text.text,
+                          profit_per_item: profit_per_item
+                        )).then((value) {
+                          Get.back();
+                          showToast(
+                            message: prod_controller.statusUpdateBodyMessage,
+                            status: prod_controller.statusUpdateMessage
+                          );
+                        });
+                      } else {
+                        showToast(message: "Values must be numbers", status: ToastStatus.Error);
+                      }
+                    }
+                  },
+                  child: const Text("Save Changes", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  _build_Form() => SingleChildScrollView(
-        child: Form(
-            key: _formkey,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 25,
-                  ),
-                  TextFormField(
-                    controller: productbarcodeController_text,
-                    enabled: false,
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white
-                    ),
-                    decoration: InputDecoration(
-                      fillColor: Color(0xFF24272E),
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 14, // your height variable
-                        horizontal: 12, // your width variable
-                      ),
-                      filled: true, // your color variable
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        borderSide: BorderSide(
-                          color: Color(0xFF387F36), // your color
-                        ),
-                      ),
-                      labelText: 'Barcode', // Pass the label text here
-                      labelStyle: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                      ),
-                      hintText: "Barcode...",
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextFormField(
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Name must not be empty";
-                        }
-                        return null;
-                      },
-                      controller: productNameController_text,
-                    style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.white
-                    ),
-                      decoration: InputDecoration(
-                      fillColor: Color(0xFF24272E),
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 14, // your height variable
-                horizontal: 12, // your width variable
-              ),
-              filled: true, // your color variable
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                borderSide: BorderSide(
-                  color: Color(0xFF387F36), // your color
-                ),
-              ),
-              labelText: 'Name...', // Pass the label text here
-              labelStyle: TextStyle(
-                color: Colors.white,
-                fontFamily: 'Roboto',
-                fontWeight: FontWeight.w400,
-                fontSize: 16,
-              ),
-              hintText: "Name...",
-
-            ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                 Row(
-                   children: [
-                     Expanded(
-                       child: TextFormField(
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Price must not be empty";
-                              }
-                              return null;
-                            },
-                            keyboardType: TextInputType.phone,
-                            controller: productPriceController_text,
-                         style: TextStyle(
-                             fontWeight: FontWeight.normal,
-                             color: Colors.white
-                         ),
-                         decoration: InputDecoration(
-                           fillColor: Color(0xFF24272E),
-                           contentPadding: EdgeInsets.symmetric(
-                             vertical: 14, // your height variable
-                             horizontal: 12, // your width variable
-                           ),
-                           filled: true, // your color variable
-                           border: OutlineInputBorder(
-                             borderRadius: BorderRadius.circular(10.0),
-                             borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                           ),
-                           focusedBorder: OutlineInputBorder(
-                             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                             borderSide: BorderSide(
-                               color: Color(0xFF387F36), // your color
-                             ),
-                           ),
-                           labelText: 'Price...', // Pass the label text here
-                           labelStyle: TextStyle(
-                             color: Colors.white,
-                             fontFamily: 'Roboto',
-                             fontWeight: FontWeight.w400,
-                             fontSize: 16,
-                           ),
-                           hintText: "Price",
-
-                         ),),
-                     ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Qty must not be empty";
-                              }
-                              return null;
-                            },
-                            keyboardType: TextInputType.phone,
-                            controller: productQtyController_text,
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              color: Colors.white
-                          ),
-                          decoration: InputDecoration(
-                            fillColor: Color(0xFF24272E),
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: 14, // your height variable
-                              horizontal: 12, // your width variable
-                            ),
-                            filled: true, // your color variable
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(
-                                color: Color(0xFF387F36), // your color
-                              ),
-                            ),
-                            labelText: 'Qty', // Pass the label text here
-                            labelStyle: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'Roboto',
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                            ),
-                            hintText: "Qty...",
-
-                          ),
-                        ),
-                      ),
-                   ],
-                 ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  TextFormField(
-                      readOnly: true,
-                      keyboardType: TextInputType.phone,
-                      controller: profitperitemcontroller_text,
-                    style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        color: Colors.white
-                    ),
-                    decoration: InputDecoration(
-                      fillColor: Color(0xFF24272E),
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 14, // your height variable
-                        horizontal: 12, // your width variable
-                      ),
-                      filled: true, // your color variable
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                        borderSide: BorderSide(
-                          color: Color(0xFF387F36), // your color
-                        ),
-                      ),
-                      labelText: 'current profit per item...', // Pass the label text here
-                      labelStyle: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16,
-                      ),
-                      hintText: "current profit per item",
-
-                    ),
-
-                  ),
-                ],
-              ),
-            )),
-      );
+  Widget _buildField({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool enabled = true,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF382959))),
+        ),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          enabled: enabled,
+          keyboardType: keyboardType,
+          style: TextStyle(fontWeight: FontWeight.w600, color: enabled ? Colors.black : Colors.grey[600]),
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: Icon(icon, color: Colors.grey[400], size: 22),
+            filled: true,
+            fillColor: enabled ? Colors.grey[100] : Colors.grey[50],
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+          ),
+        ),
+      ],
+    );
+  }
 }

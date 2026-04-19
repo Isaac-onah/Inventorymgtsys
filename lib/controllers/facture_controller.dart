@@ -83,6 +83,50 @@ class FactureController extends ChangeNotifier {
     return _list_of_detailsFacture;
   }
 
+  Future<void> getAllFilteredReceipts({String? startDate, String? endDate, String? itemName}) async {
+    list_of_receipts = [];
+    var dbm = await marketdb.database;
+    String query = "SELECT f.*, GROUP_CONCAT(df.name, ', ') as itemNames FROM factures as f LEFT JOIN detailsfacture as df ON f.id = df.facture_id WHERE 1=1 ";
+    
+    if (startDate != null && startDate.isNotEmpty) {
+      query += " AND f.facturedate >= '$startDate' ";
+    }
+    if (endDate != null && endDate.isNotEmpty) {
+      query += " AND f.facturedate <= '$endDate' ";
+    }
+    
+    query += " GROUP BY f.id ";
+    
+    if (itemName != null && itemName.isNotEmpty) {
+      query += " HAVING itemNames LIKE '%$itemName%' ";
+    }
+    query += " ORDER BY f.facturedate DESC, f.id DESC LIMIT 100";
+
+    await dbm.rawQuery(query).then((value) {
+      if (value.isNotEmpty) {
+        for (var element in value) {
+          list_of_receipts.add(FactureModel.fromJson(element));
+        }
+      }
+      notifyListeners();
+    });
+  }
+
+  Future<List<DetailsFactureModel>> getReceiptDetails(String receiptId) async {
+    List<DetailsFactureModel> _list_of_detailsFacture = [];
+    var dbm = await marketdb.database;
+    String query =
+        "select df.barcode , df.name, SUM(df.qty) as qty , (df.price/df.qty) as price , SUM(df.price) as totalprice  from detailsfacture as df , factures as f on df.facture_id=f.id where f.id='$receiptId' group by df.barcode order by df.name";
+    await dbm.rawQuery(query).then((value) {
+      if (value.isNotEmpty) {
+        for (var element in value) {
+          _list_of_detailsFacture.add(DetailsFactureModel.fromJson(element));
+        }
+      }
+    });
+    return _list_of_detailsFacture;
+  }
+
 //-----------NOTE get Best Selling products -------------
 
   List<BestSellingVmodel> _list_of_BestSelling = [];
@@ -258,5 +302,27 @@ class FactureController extends ChangeNotifier {
         //print(value.toList());
       });
     }
+  }
+  List<DailySalesVm> _lastSevenDaysSales = [];
+  List<DailySalesVm> get lastSevenDaysSales => _lastSevenDaysSales;
+
+  Future<void> getSevenDaysSales() async {
+    _lastSevenDaysSales = [];
+    var dbm = await marketdb.database;
+    DateTime today = DateTime.now();
+
+    for (int i = 6; i >= 0; i--) {
+      DateTime date = today.subtract(Duration(days: i));
+      String dateStr = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+      
+      await dbm.rawQuery("select Sum(price) as total_sales_in_day from factures where facturedate='$dateStr'").then((value) {
+        double amount = 0;
+        if (value.isNotEmpty && value[0]['total_sales_in_day'] != null) {
+          amount = double.tryParse(value[0]['total_sales_in_day'].toString()) ?? 0;
+        }
+        _lastSevenDaysSales.add(DailySalesVm(total_sales_in_day: amount, day_in_month: date.day));
+      });
+    }
+    notifyListeners();
   }
 }

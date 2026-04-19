@@ -8,6 +8,17 @@ TextStyle get headerProductTable {
 }
 
 
+LinearGradient get myLinearGradient {
+  return const LinearGradient(
+    colors: [
+      Color(0xFF4A2C7A),
+      Color(0xFF2D1B52),
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
+
 LinearGradient get myDisabledGradient {
   return LinearGradient(
     colors: [

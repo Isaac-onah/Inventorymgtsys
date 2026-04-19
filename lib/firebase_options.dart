@@ -66,7 +66,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCRauQYOZQx_fyzoa67sqtUuLBBIrHN1AQ',
-    appId: '1:941769297616:android:dc5d50a9f56fc961cf98d5',
+    appId: '1:941769297616:ios:dc5d50a9f56fc961cf98d5',
     messagingSenderId: '792298009691',
     projectId: 'posservice-e14ae',
     storageBucket: 'posservice-e14ae.appspot.com',

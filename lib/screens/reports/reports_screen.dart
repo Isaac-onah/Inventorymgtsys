@@ -1,604 +1,223 @@
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:myinventory/controllers/auth_controller.dart';
-// import 'package:myinventory/controllers/facture_controller.dart';
-// import 'package:myinventory/controllers/products_controller.dart';
-// import 'package:myinventory/models/details_facture.dart';
-// import 'package:myinventory/models/viewmodel/best_selling.dart';
-// import 'package:myinventory/models/viewmodel/earn_spent_vmodel.dart';
-// import 'package:myinventory/models/viewmodel/low_qty_model.dart';
-// import 'package:myinventory/models/viewmodel/profitable_vmodel.dart';
-// import 'package:myinventory/screens/dashboard/dashboard_screen.dart';
-// import 'package:myinventory/screens/receipts_screen/receipts_screen.dart';
-// import 'package:myinventory/services/api/pdf_api.dart';
-// import 'package:myinventory/shared/components/default_text_form.dart';
-// import 'package:myinventory/shared/constant.dart';
-// import 'package:myinventory/shared/styles.dart';
-// import 'package:myinventory/shared/toast_message.dart';
-// //import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
+import 'package:myinventory/controllers/products_controller.dart';
+import 'package:myinventory/screens/reports/report_preview_screen.dart';
+import 'package:myinventory/shared/toast_message.dart';
+import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
-// import 'package:provider/provider.dart';
-// import 'package:restart_app/restart_app.dart';
-// import 'package:rflutter_alert/rflutter_alert.dart';
-// import 'package:sqflite/sqflite.dart';
+class ReportsScreen extends StatelessWidget {
+  const ReportsScreen({super.key});
 
-// class ReportsScreen extends StatelessWidget {
-//   final List<String> _report_title = [
-//     "Receipts",
-//     "Daily Sales",
-//     "Sales Between Two Dates",
-//     "Best Selling",
-//     "Most profitable Products",
-//     "Low Qty In Store",
-//     "Spent / Earn by Item",
-//     "DashBoard",
-//   ];
+  final List<Map<String, dynamic>> _reportOptions = const [
+    {
+      "title": "Daily Sales",
+      "subtitle": "Overview of sales for a specific date",
+      "icon": Iconsax.calendar_1,
+      "color": Colors.blue,
+      "type": "daily",
+    },
+    {
+      "title": "Range Sales",
+      "subtitle": "Sales performance between two dates",
+      "icon": Iconsax.calendar_tick,
+      "color": Colors.green,
+      "type": "range",
+    },
+    {
+      "title": "Best Selling",
+      "subtitle": "Top products by sales volume",
+      "icon": Iconsax.award,
+      "color": Colors.orange,
+      "type": "best_selling",
+    },
+    {
+      "title": "Most Profitable",
+      "subtitle": "Products generating highest profit",
+      "icon": Iconsax.money_send,
+      "color": Colors.purple,
+      "type": "profitable",
+    },
+    {
+      "title": "Low Stock",
+      "subtitle": "Products running low on inventory",
+      "icon": Iconsax.status_up,
+      "color": Colors.red,
+      "type": "low_stock",
+    },
+    {
+      "title": "Item Analysis",
+      "subtitle": "Detailed spent vs earned by item",
+      "icon": Iconsax.activity,
+      "color": Colors.teal,
+      "type": "item_analysis",
+    },
+  ];
 
-//   final List<IconData> _report_icons = [
-//     Icons.receipt,
-//     Icons.report,
-//     Icons.report,
-//     Icons.loyalty_sharp,
-//     Icons.turn_sharp_right_outlined,
-//     Icons.warning_amber_rounded,
-//     Icons.currency_exchange_outlined,
-//     Icons.dashboard_outlined,
-//   ];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text("Reports & Analytics", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Business Reports",
+              style: TextStyle(color: Color(0xFF382959), fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Select a report type to view and export data",
+              style: TextStyle(color: Colors.grey[600], fontSize: 13),
+            ),
+            const SizedBox(height: 25),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.9,
+              ),
+              itemCount: _reportOptions.length,
+              itemBuilder: (context, index) {
+                final option = _reportOptions[index];
+                return _buildReportCard(context, option);
+              },
+            ),
+            const SizedBox(height: 30),
+            const Text(
+              "Danger Zone",
+              style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 15),
+            _buildActionItem(
+              context,
+              "Clean Database",
+              "Permanently delete all transaction data",
+              Iconsax.trash,
+              Colors.red,
+              () => _showDeleteConfirmation(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-//   var datecontroller = TextEditingController();
-//   var startdatecontroller = TextEditingController();
-//   var enddatecontroller = TextEditingController();
-//   var nbOfProductsController = TextEditingController();
+  Widget _buildReportCard(BuildContext context, Map<String, dynamic> option) {
+    return InkWell(
+      onTap: () => Get.to(() => ReportPreviewScreen(reportType: option['type'], title: option['title'])),
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.05),
+              spreadRadius: 2,
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: option['color'].withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(option['icon'], color: option['color'], size: 28),
+            ),
+            const Spacer(),
+            Text(
+              option['title'],
+              style: const TextStyle(color: Color(0xFF382959), fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              option['subtitle'],
+              style: TextStyle(color: Colors.grey[500], fontSize: 10),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return ChangeNotifierProvider<FactureController>(
-//       create: (_) => FactureController(),
-//       child: Scaffold(
-//         body: Consumer<FactureController>(
-//           builder: (context, facturecontroller, child) {
-//             return SingleChildScrollView(
-//               child: Padding(
-//                 padding: EdgeInsets.only(
-//                     left: MediaQuery.of(context).size.width * 0.04,
-//                     top: MediaQuery.of(context).size.width * 0.04),
-//                 child: Wrap(
-//                   crossAxisAlignment: WrapCrossAlignment.center,
-//                   spacing:
-//                       MediaQuery.of(context).size.width * 0.04, // horizontal
-//                   runSpacing: 8, // vertical
-//                   children: [
-//                     ..._report_title.map(
-//                       (element) => _report_item(
-//                         element,
-//                         _report_icons[_report_title.indexOf(element)],
-//                         _report_title.indexOf(element),
-//                         context,
-//                       ),
-//                     )
-//                   ],
-//                 ),
-//               ),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
+  Widget _buildActionItem(BuildContext context, String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: color.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.bold)),
+                  Text(subtitle, style: TextStyle(color: color.withOpacity(0.7), fontSize: 12)),
+                ],
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: color, size: 14),
+          ],
+        ),
+      ),
+    );
+  }
 
-//   _report_item(
-//     String title,
-//     IconData icon,
-//     int index,
-//     BuildContext context,
-//   ) {
-//     AuthController authController = Provider.of<AuthController>(context);
-//     return GestureDetector(
-//       onTap: () async {
-//         switch (index) {
-//           case 0:
-//             showDatePicker(
-//                     context: context,
-//                     initialDate: DateTime.now(),
-//                     firstDate: DateTime.parse('2022-01-01'),
-//                     lastDate: DateTime.parse('2040-01-01'))
-//                 .then((value) {
-//               //Todo: handle date to string
-//               //print(DateFormat.yMMMd().format(value!));
-//               var tdate = value.toString().split(' ');
-//               //datecontroller.text = tdate[0];
-//               Get.to(() => ReceiptsScreen(tdate[0].toString()));
-//             });
-//             break;
-//           case 1:
-//             datecontroller.clear();
-
-//             Alert(
-//                 context: context,
-//                 title: "Enter Date",
-//                 content: Column(
-//                   children: <Widget>[
-//                     defaultTextFormField(
-//                         readonly: true,
-//                         controller: datecontroller,
-//                         inputtype: TextInputType.datetime,
-//                         prefixIcon: Icon(Icons.date_range),
-//                         ontap: () {
-//                           showDatePicker(
-//                                   context: context,
-//                                   initialDate: DateTime.now(),
-//                                   firstDate: DateTime.parse('2022-01-01'),
-//                                   lastDate: DateTime.parse('2040-01-01'))
-//                               .then((value) {
-//                             //Todo: handle date to string
-//                             //print(DateFormat.yMMMd().format(value!));
-//                             var tdate = value.toString().split(' ');
-//                             datecontroller.text = tdate[0];
-//                           });
-//                         },
-//                         onvalidate: (value) {
-//                           if (value!.isEmpty) {
-//                             return "date must not be empty";
-//                           }
-//                           return null;
-//                         },
-//                         text: "date"),
-//                   ],
-//                 ),
-//                 buttons: [
-//                   DialogButton(
-//                     onPressed: () async {
-//                       if (datecontroller.text.trim() == "null" ||
-//                           datecontroller.text.trim() == "") {
-//                         showToast(
-//                             message: "date must be not empty or null ",
-//                             status: ToastStatus.Error);
-//                         print(datecontroller.text);
-//                       } else {
-//                         Navigator.pop(context);
-
-//                         await context
-//                             .read<FactureController>()
-//                             .getReportByDate(datecontroller.text)
-//                             .then((value) {
-//                           print(value.length.toString());
-//                           _openReportByDateOrBetween(
-//                               value, datecontroller.text.toString());
-//                         });
-//                       }
-//                     },
-//                     child: Text(
-//                       "Ok",
-//                       style: TextStyle(color: Colors.white, fontSize: 20),
-//                     ),
-//                   )
-//                 ]).show();
-//             break;
-//           case 2:
-//             startdatecontroller.clear();
-//             enddatecontroller.clear();
-//             Alert(
-//                 context: context,
-//                 title: "Enter Dates",
-//                 content: Column(
-//                   children: <Widget>[
-//                     defaultTextFormField(
-//                         readonly: true,
-//                         controller: startdatecontroller,
-//                         inputtype: TextInputType.datetime,
-//                         prefixIcon: Icon(Icons.date_range),
-//                         ontap: () {
-//                           showDatePicker(
-//                                   context: context,
-//                                   initialDate: DateTime.now(),
-//                                   firstDate: DateTime.parse('2022-01-01'),
-//                                   lastDate: DateTime.parse('2040-01-01'))
-//                               .then((value) {
-//                             //Todo: handle date to string
-//                             //print(DateFormat.yMMMd().format(value!));
-//                             var tdate = value.toString().split(' ');
-//                             startdatecontroller.text = tdate[0];
-//                           });
-//                         },
-//                         onvalidate: (value) {
-//                           if (value!.isEmpty) {
-//                             return "start date must not be empty";
-//                           }
-//                           return null;
-//                         },
-//                         text: "start date"),
-//                     SizedBox(
-//                       height: 10,
-//                     ),
-//                     defaultTextFormField(
-//                         readonly: true,
-//                         controller: enddatecontroller,
-//                         inputtype: TextInputType.datetime,
-//                         prefixIcon: Icon(Icons.date_range),
-//                         ontap: () {
-//                           showDatePicker(
-//                                   context: context,
-//                                   initialDate: DateTime.now(),
-//                                   firstDate: DateTime.parse('2022-01-01'),
-//                                   lastDate: DateTime.parse('2040-01-01'))
-//                               .then((value) {
-//                             //Todo: handle date to string
-//                             //print(DateFormat.yMMMd().format(value!));
-//                             var tdate = value.toString().split(' ');
-//                             enddatecontroller.text = tdate[0];
-//                           });
-//                         },
-//                         onvalidate: (value) {
-//                           if (value!.isEmpty) {
-//                             return "end date must not be empty";
-//                           }
-//                           return null;
-//                         },
-//                         text: "end date"),
-//                   ],
-//                 ),
-//                 buttons: [
-//                   DialogButton(
-//                     onPressed: () async {
-//                       //  print(datecontroller.text);
-//                       if ((startdatecontroller.text.trim() == "null" ||
-//                               startdatecontroller.text.trim() == "") ||
-//                           (enddatecontroller.text.trim() == "null" ||
-//                               enddatecontroller.text.trim() == "")) {
-//                         showToast(
-//                             message:
-//                                 "start or enddate  must be not empty or null ",
-//                             status: ToastStatus.Error);
-//                       } else {
-//                         Navigator.pop(context);
-
-//                         await context
-//                             .read<FactureController>()
-//                             .getDetailsFacturesBetweenTwoDates(
-//                                 startdatecontroller.text,
-//                                 enddatecontroller.text)
-//                             .then((value) {
-//                           print(value.length.toString());
-//                           _openReportByDateOrBetween(
-//                               value, startdatecontroller.text.toString(),
-//                               enddate: enddatecontroller.text);
-//                         });
-//                       }
-//                     },
-//                     child: Text(
-//                       "Ok",
-//                       style: TextStyle(color: Colors.white, fontSize: 20),
-//                     ),
-//                   )
-//                 ]).show();
-//             break;
-//           case 3:
-//             Alert(
-//                 context: context,
-//                 title: "Nb of Displayed Product",
-//                 content: Column(
-//                   children: <Widget>[
-//                     TextField(
-//                       controller: nbOfProductsController,
-//                       keyboardType: TextInputType.phone,
-//                       decoration: InputDecoration(
-//                         labelText: 'nb of products ',
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 buttons: [
-//                   DialogButton(
-//                     onPressed: () async {
-//                       if (nbOfProductsController.text.trim() == "")
-//                         showToast(
-//                             message: "Nb of Displayed Product",
-//                             status: ToastStatus.Error);
-//                       else {
-//                         Navigator.pop(context);
-
-//                         int? nbofproduct =
-//                             int.tryParse(nbOfProductsController.text);
-//                         if (nbofproduct != null) {
-//                           await context
-//                               .read<FactureController>()
-//                               .getBestSelling(
-//                                   nbOfproduct: nbOfProductsController.text)
-//                               .then((value) {
-//                             _openBestSellingReport(value);
-//                           });
-
-//                           nbOfProductsController.clear();
-//                         } else {
-//                           showToast(
-//                               message: "nb of products must be an integer",
-//                               status: ToastStatus.Error);
-//                         }
-//                       }
-//                     },
-//                     child: Text(
-//                       "Ok",
-//                       style: TextStyle(color: Colors.white, fontSize: 20),
-//                     ),
-//                   )
-//                 ]).show();
-
-//             break;
-
-//           case 4:
-//             Alert(
-//                 context: context,
-//                 title: "Nb of Displayed Product",
-//                 content: Column(
-//                   children: <Widget>[
-//                     TextField(
-//                       controller: nbOfProductsController,
-//                       keyboardType: TextInputType.phone,
-//                       decoration: InputDecoration(
-//                         labelText: 'nb of products ',
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 buttons: [
-//                   DialogButton(
-//                     onPressed: () async {
-//                       if (nbOfProductsController.text.trim() == "")
-//                         showToast(
-//                             message: "Nb of Displayed Product",
-//                             status: ToastStatus.Error);
-//                       else {
-//                         int? nbofproduct =
-//                             int.tryParse(nbOfProductsController.text);
-//                         if (nbofproduct != null) {
-//                           Navigator.pop(context);
-
-//                           await context
-//                               .read<FactureController>()
-//                               .getMostprofitableList(
-//                                   nbOfproduct: nbofproduct.toString())
-//                               .then((value) async {
-//                             await _openMostProfitableReport(value);
-//                           });
-
-//                           nbOfProductsController.clear();
-//                         } else {
-//                           showToast(
-//                               message: "nb of products must be an integer",
-//                               status: ToastStatus.Error);
-//                         }
-//                       }
-//                     },
-//                     child: Text(
-//                       "Ok",
-//                       style: TextStyle(color: Colors.white, fontSize: 20),
-//                     ),
-//                   )
-//                 ]).show();
-
-//             break;
-
-//           case 5:
-//             Alert(
-//                 context: context,
-//                 title: "Nb of Displayed Product",
-//                 content: Column(
-//                   children: <Widget>[
-//                     TextField(
-//                       controller: nbOfProductsController,
-//                       keyboardType: TextInputType.phone,
-//                       decoration: InputDecoration(
-//                         labelText: 'nb of products ',
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//                 buttons: [
-//                   DialogButton(
-//                     onPressed: () async {
-//                       if (nbOfProductsController.text.trim() == "")
-//                         showToast(
-//                             message: "Nb of Displayed Product",
-//                             status: ToastStatus.Error);
-//                       else {
-//                         int? nbofproduct =
-//                             int.tryParse(nbOfProductsController.text);
-//                         if (nbofproduct != null) {
-//                           Navigator.pop(context);
-
-//                           await context
-//                               .read<FactureController>()
-//                               .getLowQtyProductInStore(nbofproduct.toString())
-//                               .then((value) async {
-//                             await _openLowQtyReport(value);
-//                           });
-
-//                           nbOfProductsController.clear();
-//                         } else {
-//                           showToast(
-//                               message: "nb of products must be an integer",
-//                               status: ToastStatus.Error);
-//                         }
-//                       }
-//                     },
-//                     child: Text(
-//                       "Ok",
-//                       style: TextStyle(color: Colors.white, fontSize: 20),
-//                     ),
-//                   )
-//                 ]).show();
-
-//             break;
-
-//           case 6:
-//             await context
-//                 .read<FactureController>()
-//                 .getEarnSpentGoupeByItem()
-//                 .then((value) => {
-//                       value.forEach((element) async {
-//                         print(element.toJson());
-//                         await _openEarnSpenReport(value);
-//                       })
-//                     });
-//             break;
-//           case 7:
-//           // showMonthPicker(
-//           //   context: context,
-//           //   firstDate: DateTime(DateTime.now().year - 1, 5),
-//           //   lastDate: DateTime(DateTime.now().year + 1, 9),
-//           //   initialDate: DateTime.now(),
-//           //   locale: Locale("en"),
-//           // ).then((date) {
-//           //   if (date != null) {
-//           //     print(date.toString());
-//           //     print("--------");
-
-//           //     //print(latestday_inCurrentMonth);
-
-//           //     Get.to(DashBoardScreen(date));
-//           //   }
-//           // });
-//           // break;
-//           case 8:
-//             var alertStyle =
-//                 AlertStyle(animationDuration: Duration(milliseconds: 1));
-//             Alert(
-//               style: alertStyle,
-//               context: context,
-//               type: AlertType.warning,
-//               title: "Delete Data",
-//               desc: "Are You Sure You Want To Delete All Data'",
-//               buttons: [
-//                 DialogButton(
-//                   child: Text(
-//                     "Cancel",
-//                     style: TextStyle(color: Colors.white, fontSize: 18),
-//                   ),
-//                   onPressed: () {
-//                     Navigator.pop(context);
-//                   },
-//                   color: Colors.blue.shade400,
-//                 ),
-//                 DialogButton(
-//                   child: Text(
-//                     "Delete",
-//                     style: TextStyle(color: Colors.white, fontSize: 18),
-//                   ),
-//                   onPressed: () async {
-//                     await context
-//                         .read<ProductsController>()
-//                         .cleanDatabase()
-//                         .then((value) {
-//                       showToast(
-//                           message: "Data Deleted", status: ToastStatus.Success);
-//                       Navigator.pop(context);
-//                     });
-//                   },
-//                   color: Colors.red.shade400,
-//                 ),
-//               ],
-//             ).show();
-
-//             break;
-//           case 9:
-//             if (currentuser != null) {
-//               var alertStyle =
-//                   AlertStyle(animationDuration: Duration(milliseconds: 1));
-//               Alert(
-//                 style: alertStyle,
-//                 context: context,
-//                 type: AlertType.warning,
-//                 title: "Reload Data",
-//                 desc: "Are You Sure You Want To Reload All Data'",
-//                 buttons: [
-//                   DialogButton(
-//                     child: Text(
-//                       "Cancel",
-//                       style: TextStyle(color: Colors.white, fontSize: 18),
-//                     ),
-//                     onPressed: () {
-//                       Navigator.pop(context);
-//                     },
-//                     color: Colors.blue.shade400,
-//                   ),
-//                   DialogButton(
-//                     child: Text(
-//                       "Delete",
-//                       style: TextStyle(color: Colors.white, fontSize: 18),
-//                     ),
-//                     onPressed: () {
-//                       deleteDatabase().then((value) {
-//                         Restart.restartApp();
-//                       });
-//                     },
-//                     color: Colors.red.shade400,
-//                   ),
-//                 ],
-//               ).show();
-//             } else {
-//               showToast(
-//                   message: "Please Sign In with google to Restore Data",
-//                   status: ToastStatus.Warning,
-//                   time: 3);
-//             }
-//         }
-//       },
-//       child: Container(
-//         width: MediaQuery.of(context).size.width * 0.44,
-//         height: MediaQuery.of(context).size.width * 0.44,
-//         decoration: BoxDecoration(
-//             gradient: currentuser == null && index == 9
-//                 ? myDisabledGradient
-//                 : myLinearGradient,
-//             borderRadius: BorderRadius.circular(8)),
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Icon(icon, size: 60, color: Colors.white),
-//             SizedBox(
-//               height: 10,
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(8.0),
-//               child: Text(
-//                 title,
-//                 textAlign: TextAlign.center,
-//                 style: TextStyle(color: Colors.white, fontSize: 20),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Future<void> _openReportByDateOrBetween(
-//       List<DetailsFactureModel> list, String startDate,
-//       {String? enddate}) async {
-//     final pdfFile = await PdfApi.generateReport(list,
-//         startDate: startDate, endDate: enddate);
-//     PdfApi.openFile(pdfFile);
-//   }
-
-//   Future<void> _openBestSellingReport(List<BestSellingVmodel> list) async {
-//     final pdfFile = await PdfApi.generateBestSellingReport(list);
-//     PdfApi.openFile(pdfFile);
-//   }
-
-//   Future<void> _openMostProfitableReport(List<ProfitableVModel> list) async {
-//     final pdfFile = await PdfApi.generateMostProfitableReport(list);
-//     PdfApi.openFile(pdfFile);
-//   }
-
-//   Future<void> _openEarnSpenReport(List<EarnSpentVmodel> list) async {
-//     final pdfFile = await PdfApi.generateEarnSpentReport(list);
-//     PdfApi.openFile(pdfFile);
-//   }
-
-//   Future<void> _openLowQtyReport(List<LowQtyVModel> list) async {
-//     final pdfFile = await PdfApi.generateLowQtyReport(list);
-//     PdfApi.openFile(pdfFile);
-//   }
-
-//   Future<void> deleteDatabase() => databaseFactory.deleteDatabase(databasepath);
-// }
+  void _showDeleteConfirmation(BuildContext context) {
+    Alert(
+      context: context,
+      type: AlertType.warning,
+      title: "Delete All Data",
+      desc: "This action cannot be undone. Are you sure?",
+      buttons: [
+        DialogButton(
+          onPressed: () => Navigator.pop(context),
+          color: Colors.grey,
+          child: const Text("Cancel", style: TextStyle(color: Colors.white)),
+        ),
+        DialogButton(
+          onPressed: () async {
+            await context.read<ProductsController>().cleanDatabase().then((value) {
+              showToast(message: "Database Cleared", status: ToastStatus.Success);
+              Navigator.pop(context);
+            });
+          },
+          color: Colors.red,
+          child: const Text("Delete", style: TextStyle(color: Colors.white)),
+        ),
+      ],
+    ).show();
+  }
+}

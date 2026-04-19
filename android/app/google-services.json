@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "941769297616-4qp4q0bdricvjg8034fqsn0k63fthauv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.isaac.myinventory",
+            "certificate_hash": "f743cf804cc10abe18e4597306016958a39a0bd3"
+          }
+        },
+        {
           "client_id": "941769297616-vu6u0k3su8s4p1kr0lvhkpi8568nr8n8.apps.googleusercontent.com",
           "client_type": 3
         }

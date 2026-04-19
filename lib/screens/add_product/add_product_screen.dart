@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:myinventory/controllers/products_controller.dart';
 import 'package:myinventory/models/product.dart';
 import 'package:myinventory/shared/components/default_button.dart';
@@ -18,27 +18,30 @@ class AddProductScreen extends StatefulWidget {
 class _AddProductScreenState extends State<AddProductScreen> {
   final qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? qrViewcontroller;
-  Barcode? barCode = null;
+  Barcode? barCode;
   bool is_onScan = false;
-  bool isflashOn = true;
+  bool isflashOn = false;
 
-//For fields if has data
+  final productbarcodeController_text = TextEditingController();
+  final productNameController_text = TextEditingController();
+  final productPriceController_text = TextEditingController();
+  final productTotalPriceController_text = TextEditingController();
+  final productQtyController = TextEditingController();
 
-  var productbarcodeController_text = TextEditingController();
-  var productNameController_text = TextEditingController();
-  var productPriceController_text = TextEditingController();
-  var productTotalPriceController_text = TextEditingController();
-  var productQtyController = TextEditingController();
-
-  GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    this.qrViewcontroller?.dispose();
+    qrViewcontroller?.dispose();
+    productbarcodeController_text.dispose();
+    productNameController_text.dispose();
+    productPriceController_text.dispose();
+    productTotalPriceController_text.dispose();
+    productQtyController.dispose();
     super.dispose();
   }
 
+  @override
   void reassemble() async {
     super.reassemble();
     if (Platform.isAndroid) {
@@ -50,418 +53,226 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        flexibleSpace: Container(
-        color: Colors.green,
-        ),
-        title: Text("Add New Product"),
+        title: const Text("Add New Product", style: TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Color(0xFF382959)),
       ),
-      body: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          if (is_onScan) _buildQr(context),
-          if (is_onScan)
-            Positioned(
-              top: 10,
-              child: _buildControlButton(),
-            ),
-          if (!is_onScan)
-            SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _build_Form(context),
-                  SizedBox(
-                    height: 35,
-                  ),
-                  _buildSubmitRow(context),
-                  SizedBox(
-                    height: 35,
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
+      body: is_onScan ? _buildScannerView() : _buildFormView(context),
     );
   }
 
-  _buildQr(BuildContext context) => QRView(
-        key: qrKey,
-        onQRViewCreated: onQRViewCreatedCallback,
-        overlay: QrScannerOverlayShape(
-            borderColor: defaultColor,
-            borderWidth: 7,
-            borderLength: 20,
-            borderRadius: 10,
-            cutOutSize: MediaQuery.of(context).size.width * 0.7),
-      );
-
-  void onQRViewCreatedCallback(QRViewController controller) {
-    setState(() {
-      this.qrViewcontroller = controller;
-    });
-
-    qrViewcontroller?.scannedDataStream.listen((barcode) {
-      setState(() {
-        this.barCode = barcode;
-        is_onScan = false;
-        qrViewcontroller?.pauseCamera();
-
-        productbarcodeController_text.text = barcode.code.toString();
-      });
-    });
-  }
-
-  _build_Form(BuildContext context) {
-    if (barCode != null) {
-      //NOTE check if product exist
-      context
-          .read<ProductsController>()
-          .getProductbyBarcode(productbarcodeController_text.text.toString())
-          .then((value) {
-        if (value != null) {
-          productNameController_text.text = value.name.toString();
-          productPriceController_text.text = value.price.toString();
-        }
-        // print("is product exist " +
-        //     context.read<ProductsController>().isProductExist.toString());
-      });
-    }
-
-    return Form(
-        key: _formkey,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20),
-          child: Column(
+  Widget _buildScannerView() {
+    return Stack(
+      children: [
+        QRView(
+          key: qrKey,
+          onQRViewCreated: onQRViewCreatedCallback,
+          overlay: QrScannerOverlayShape(
+            borderColor: const Color(0xFF382959),
+            borderWidth: 8,
+            borderLength: 30,
+            borderRadius: 16,
+            cutOutSize: MediaQuery.of(context).size.width * 0.7,
+          ),
+        ),
+        Positioned(
+          top: 50,
+          left: 20,
+          right: 20,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "barcode must not be empty";
-                    }
-                    return null;
-                  },
-                  // readonly: context.read<ProductsController>().isProductExist
-                  //     ? true
-                  //     : false,
-
-                  decoration: InputDecoration(
-                    fillColor: Color(0xFF24272E),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 14, // your height variable
-                      horizontal: 12, // your width variable
-                    ),
-                    filled: true, // your color variable
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(
-                        color: Color(0xFF387F36), // your color
-                      ),
-                    ),
-                    labelText: 'Barcode', // Pass the label text here
-                    labelStyle: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                    ),
-                    hintText: "Barcode...",
-
-                    suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            is_onScan = true;
-                          });
-                        },
-                        icon: Icon(Icons.qr_code_scanner,color:Color(0xFF387F36) ,)),
-                  ),
-                  controller: productbarcodeController_text),
-              SizedBox(
-                height: 15,
+              IconButton(
+                style: IconButton.styleFrom(backgroundColor: Colors.white24),
+                onPressed: () => setState(() => is_onScan = false),
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
               ),
-             TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Name must not be empty";
-                    }
-                    return null;
-                  },
-                  readOnly: context.read<ProductsController>().isProductExist
-                      ? true
-                      : false,
-                 decoration: InputDecoration(
-                   fillColor: Color(0xFF24272E),
-                   contentPadding: EdgeInsets.symmetric(
-                     vertical: 14, // your height variable
-                     horizontal: 12, // your width variable
-                   ),
-                   filled: true, // your color variable
-                   border: OutlineInputBorder(
-                     borderRadius: BorderRadius.circular(10.0),
-                     borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                   ),
-                   focusedBorder: OutlineInputBorder(
-                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                     borderSide: BorderSide(
-                       color: Color(0xFF387F36), // your color
-                     ),
-                   ),
-                   labelText: 'Name', // Pass the label text here
-                   labelStyle: TextStyle(
-                     color: Colors.white,
-                     fontFamily: 'Roboto',
-                     fontWeight: FontWeight.w400,
-                     fontSize: 16,
-                   ),
-                   hintText: "Name...",
-                 ),
-                  controller: productNameController_text),
-              SizedBox(
-                height: 15,
+              IconButton(
+                style: IconButton.styleFrom(backgroundColor: Colors.white24),
+                onPressed: () {
+                  qrViewcontroller?.toggleFlash();
+                  setState(() => isflashOn = !isflashOn);
+                },
+                icon: Icon(isflashOn ? Icons.flash_on : Icons.flash_off, color: Colors.white, size: 28),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return "Price must not be empty";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          fillColor: Color(0xFF24272E),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 14, // your height variable
-                            horizontal: 12, // your width variable
-                          ),
-                          filled: true, // your color variable
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF387F36), // your color
-                            ),
-                          ),
-                          labelText: 'Price per item...', // Pass the label text here
-                          labelStyle: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                          ),
-                          hintText: "Price per item...",
-                        ),
-                        controller: productPriceController_text
-                    ),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return "Qty must not be empty";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          fillColor: Color(0xFF24272E),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: 14, // your height variable
-                            horizontal: 12, // your width variable
-                          ),
-                          filled: true, // your color variable
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(
-                              color: Color(0xFF387F36), // your color
-                            ),
-                          ),
-                          labelText: 'qty...', // Pass the label text here
-                          labelStyle: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                          ),
-                          hintText: "qty...",
-                        ),
-                        keyboardType: TextInputType.phone,
-                        controller: productQtyController),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              TextFormField(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Total Price must not be empty";
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    fillColor: Color(0xFF24272E),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 14, // your height variable
-                      horizontal: 12, // your width variable
-                    ),
-                    filled: true, // your color variable
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide(width: 1, color: Color(0xFF387F36)), // your color
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                      borderSide: BorderSide(
-                        color: Color(0xFF387F36), // your color
-                      ),
-                    ),
-                    labelText: 'Total Price...', // Pass the label text here
-                    labelStyle: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                    ),
-                    hintText: "Total Price...",
-                  ),
-                  keyboardType: TextInputType.phone,
-                  controller: productTotalPriceController_text),
             ],
           ),
-        ));
-  }
-
-  _buildSubmitRow(BuildContext context) {
-    return Wrap(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25.0),
-          child: defaultButton(
-              //width: MediaQuery.of(context).size.width * 0.4,
-              text: "Save",
-              onpress: () async {
-                if (_formkey.currentState!.validate()) {
-                  int? price = int.tryParse(productPriceController_text.text);
-                  int? qty = int.tryParse(productQtyController.text);
-                  int? totalprice =
-                      int.tryParse(productTotalPriceController_text.text);
-                  if (price != null && qty != null && totalprice != null) {
-                    print("valid");
-                    String profit_per_item =
-                        ((qty * price - totalprice) / qty).toString();
-                    context
-                        .read<ProductsController>()
-                        .insertProductByModel(
-                            model: ProductModel(
-                                barcode: productbarcodeController_text.text,
-                                name: productNameController_text.text,
-                                price: productPriceController_text.text,
-                                totalprice:
-                                    productTotalPriceController_text.text,
-                                qty: productQtyController.text,
-                                profit_per_item: profit_per_item))
-                        .then((value) {
-                      if (context
-                              .read<ProductsController>()
-                              .statusInsertMessage ==
-                          ToastStatus.Error) {
-                        showToast(
-                            message: context
-                                .read<ProductsController>()
-                                .statusInsertBodyMessage
-                                .toString(),
-                            status: context
-                                .read<ProductsController>()
-                                .statusInsertMessage);
-                      } else {
-                        productbarcodeController_text.clear();
-                        productNameController_text.clear();
-                        productPriceController_text.clear();
-                        productQtyController.clear();
-                        // marketController_needed.onchangeIndex(0);
-
-                        Get.back();
-                        showToast(
-                            message: context
-                                .read<ProductsController>()
-                                .statusInsertBodyMessage
-                                .toString(),
-                            status: context
-                                .read<ProductsController>()
-                                .statusInsertMessage);
-                      }
-                    });
-                  } else {
-                    showToast(
-                        message: "Price, Total Price Or Qty Must be a number ",
-                        status: ToastStatus.Error);
-                  }
-                } else {
-                  print("invalid");
-                }
-              }),
         ),
       ],
     );
   }
 
-  _buildControlButton() => Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          //  qrViewcontroller!.getFlashStatus() == true
-          IconButton(
-              onPressed: () {
-                qrViewcontroller!.getFlashStatus().then((value) {
-                  setState(() {
-                    isflashOn = value!;
-                  });
-                });
-                qrViewcontroller!.toggleFlash();
-              },
-              icon: Icon(
-                isflashOn ? Icons.flash_on : Icons.flash_off,
-                color: defaultColor,
-                size: 35,
-              )),
-          IconButton(
-              onPressed: () async {
-                await qrViewcontroller?.pauseCamera();
-                setState(() {
-                  is_onScan = false;
-                });
-              },
-              icon: Icon(
-                Icons.close,
-                color: defaultColor,
-                size: 35,
-              ))
-          // : IconButton(
-          //     onPressed: () {
-          //       qrViewcontroller!.toggleFlash();
-          //     },
-          //     icon: Icon(
-          //       Icons.flash_on,
-          //       color: defaultColor,
-          //     ))
-        ],
-      );
+  Widget _buildFormView(BuildContext context) {
+    if (barCode != null) {
+      context.read<ProductsController>().getProductbyBarcode(productbarcodeController_text.text).then((value) {
+        if (value != null) {
+          productNameController_text.text = value.name ?? "";
+          productPriceController_text.text = value.price ?? "";
+        }
+      });
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Form(
+        key: _formkey,
+        child: Column(
+          children: [
+            _buildField(
+              label: "Barcode",
+              controller: productbarcodeController_text,
+              hint: "Scan or enter barcode",
+              icon: Iconsax.scan_barcode,
+              suffixIcon: IconButton(
+                icon: const Icon(Iconsax.maximize_3, color: Color(0xFF382959)),
+                onPressed: () => setState(() => is_onScan = true),
+              ),
+              validator: (v) => v!.isEmpty ? "Barcode is required" : null,
+            ),
+            const SizedBox(height: 20),
+            _buildField(
+              label: "Product Name",
+              controller: productNameController_text,
+              hint: "Enter product name",
+              icon: Iconsax.box,
+              validator: (v) => v!.isEmpty ? "Name is required" : null,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildField(
+                    label: "Selling Price",
+                    controller: productPriceController_text,
+                    hint: "0.00",
+                    icon: Iconsax.dollar_circle,
+                    keyboardType: TextInputType.number,
+                    validator: (v) => v!.isEmpty ? "Price required" : null,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: _buildField(
+                    label: "Quantity",
+                    controller: productQtyController,
+                    hint: "0",
+                    icon: Iconsax.archive_1,
+                    keyboardType: TextInputType.number,
+                    validator: (v) => v!.isEmpty ? "Qty required" : null,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildField(
+              label: "Total Cost Price",
+              controller: productTotalPriceController_text,
+              hint: "0.00",
+              icon: Iconsax.money_3,
+              keyboardType: TextInputType.number,
+              validator: (v) => v!.isEmpty ? "Total cost required" : null,
+            ),
+            const SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              height: 60,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF382959),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  elevation: 0,
+                ),
+                onPressed: _handleSave,
+                child: const Text("Save Product", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildField({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    Widget? suffixIcon,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF382959))),
+        ),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          keyboardType: keyboardType,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: Icon(icon, color: Colors.grey[400], size: 22),
+            suffixIcon: suffixIcon,
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleSave() async {
+    if (_formkey.currentState!.validate()) {
+      int? price = int.tryParse(productPriceController_text.text);
+      int? qty = int.tryParse(productQtyController.text);
+      int? totalprice = int.tryParse(productTotalPriceController_text.text);
+
+      if (price != null && qty != null && totalprice != null) {
+        String profit_per_item = ((qty * price - totalprice) / qty).toString();
+        context.read<ProductsController>().insertProductByModel(
+          model: ProductModel(
+            barcode: productbarcodeController_text.text,
+            name: productNameController_text.text,
+            price: productPriceController_text.text,
+            totalprice: productTotalPriceController_text.text,
+            qty: productQtyController.text,
+            profit_per_item: profit_per_item,
+          ),
+        ).then((value) {
+          showToast(
+            message: context.read<ProductsController>().statusInsertBodyMessage.toString(),
+            status: context.read<ProductsController>().statusInsertMessage,
+          );
+          if (context.read<ProductsController>().statusInsertMessage != ToastStatus.Error) {
+            Get.back();
+          }
+        });
+      } else {
+        showToast(message: "Values must be numbers", status: ToastStatus.Error);
+      }
+    }
+  }
+
+  void onQRViewCreatedCallback(QRViewController controller) {
+    setState(() => qrViewcontroller = controller);
+    qrViewcontroller?.scannedDataStream.listen((barcode) {
+      setState(() {
+        barCode = barcode;
+        is_onScan = false;
+        productbarcodeController_text.text = barcode.code.toString();
+      });
+      qrViewcontroller?.pauseCamera();
+    });
+  }
 }

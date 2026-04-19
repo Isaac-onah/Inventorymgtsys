@@ -18,34 +18,28 @@ class AuthController extends ChangeNotifier {
   ToastStatus toastLoginStatus = ToastStatus.Error;
   bool isloadingLogin = false;
   UserModel? _userModel = null;
-  // UserModel? get userModel => _userModel;
+  UserModel? get user => _userModel;
   UserCredential? _user = null;
   GoogleSignInAccount? _googleUser;
   ga.FileList? list;
 
   Future<void> signInWithGoogle() async {
+    isloadingLogin = true;
+    notifyListeners();
     try {
       _googleUser = await _googleSignIn.signIn();
       if (_googleUser == null) {
-        // Handle case when the user cancels the sign-in
-        statusLoginMessage = "Sign-in cancelled.";
-        toastLoginStatus = ToastStatus.Error;
         isloadingLogin = false;
+        showToast(message: "Sign-in cancelled", status: ToastStatus.Warning);
         notifyListeners();
         return;
       }
 
-      isloadingLogin = true;
-      statusLoginMessage = "You have been successfully logged In";
-      toastLoginStatus = ToastStatus.Success;
-      notifyListeners();
-
       final GoogleSignInAuthentication? googleAuth = await _googleUser?.authentication;
 
       if (googleAuth == null) {
-        statusLoginMessage = "Google sign-in failed. Please try again.";
-        toastLoginStatus = ToastStatus.Error;
         isloadingLogin = false;
+        showToast(message: "Google authentication failed", status: ToastStatus.Error);
         notifyListeners();
         return;
       }
@@ -55,32 +49,33 @@ class AuthController extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      _user = await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final user = userCredential.user;
 
-      if (_user?.user != null) {
-        _user?.user?.getIdToken().then((token) {
-          _userModel = UserModel(
-              displayName: _user?.user!.displayName,
-              email: _user?.user!.email,
-              photoURL: _user?.user!.photoURL,
-              token: token);
+      if (user != null) {
+        final token = await user.getIdToken();
+        _userModel = UserModel(
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          token: token,
+        );
 
-          currentuser = _userModel;
-          CashHelper.saveUser(_userModel!);
-          isloadingLogin = false;
-          notifyListeners();
-        });
-      } else {
-        statusLoginMessage = "User not found.";
-        toastLoginStatus = ToastStatus.Error;
+        currentuser = _userModel;
+        await CashHelper.saveUser(_userModel!);
+        
         isloadingLogin = false;
+        showToast(message: "Welcome, ${user.displayName}!", status: ToastStatus.Success);
+        notifyListeners();
+      } else {
+        isloadingLogin = false;
+        showToast(message: "Firebase user not found", status: ToastStatus.Error);
         notifyListeners();
       }
     } catch (e) {
-      print('Sign in failed: $e');
-      statusLoginMessage = "Login failed, check your network connection and try again.";
-      toastLoginStatus = ToastStatus.Error;
+      debugPrint('Sign in failed: $e');
       isloadingLogin = false;
+      showToast(message: "Sign-in failed. Please check your connection.", status: ToastStatus.Error);
       notifyListeners();
     }
   }
@@ -93,22 +88,23 @@ class AuthController extends ChangeNotifier {
   Future<void> google_signOut() async {
     isloadingSignOut = true;
     notifyListeners();
-    await _googleSignIn.signOut().then((value) {
-      statusLoginMessage = "You have been successfully logged out";
-      toastSignOutStatus = ToastStatus.Success;
+    try {
+      await _googleSignIn.signOut();
+      await FirebaseAuth.instance.signOut();
+      
       _userModel = null;
       currentuser = null;
-      CashHelper.removeDatabykey(key: "user");
+      await CashHelper.removeDatabykey(key: "user");
+      
       isloadingSignOut = false;
+      showToast(message: "Logged out successfully", status: ToastStatus.Success);
       notifyListeners();
-      // print(_user?.user?.displayName);
-    }).catchError((error) {
-      statusSignOutMessage =
-          "Logged In failed, check your network connection and try again";
-      toastSignOutStatus = ToastStatus.Error;
+    } catch (error) {
+      debugPrint('Sign out failed: $error');
       isloadingSignOut = false;
+      showToast(message: "Sign-out failed", status: ToastStatus.Error);
       notifyListeners();
-    });
+    }
   }
 
   Future<void> getUserData() async {

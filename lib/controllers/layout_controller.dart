@@ -14,12 +14,12 @@ class LayoutController extends ChangeNotifier {
   ];
 
   //NOTE: ---------------------------Screens and Titles----------------------------
-  final screens = [WalletHomeScreen(), ManageProductsScreen(), SalesScreen()]; // ReportsScreen()
+  final screens = [WalletHomeScreen(), ManageProductsScreen(), SalesScreen()];
 
   final appbar_title = [
     'Home',
     'Add Item',
-    'Payment', /*'Report'*/
+    'Payment',
   ];
   final sub_appbar_title = [
     'Home',

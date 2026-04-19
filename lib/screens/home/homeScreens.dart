@@ -4,492 +4,590 @@ import 'package:iconsax/iconsax.dart';
 import 'package:myinventory/controllers/auth_controller.dart';
 import 'package:myinventory/controllers/facture_controller.dart';
 import 'package:myinventory/controllers/products_controller.dart';
-import 'package:myinventory/models/details_facture.dart';
-import 'package:myinventory/screens/home/total_wallet_balance.dart';
 import 'package:myinventory/screens/receipts_screen/receipts_screen.dart';
-import 'package:myinventory/services/api/pdf_api.dart';
-import 'package:myinventory/shared/constant.dart';
-import 'package:myinventory/shared/toast_message.dart';
+import 'package:myinventory/screens/reports/reports_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 class WalletHomeScreen extends StatefulWidget {
   const WalletHomeScreen({super.key});
 
   @override
-  _WalletHomeScreenState createState() => _WalletHomeScreenState();
+  State<WalletHomeScreen> createState() => _WalletHomeScreenState();
 }
 
 class _WalletHomeScreenState extends State<WalletHomeScreen> {
-  var datecontroller = TextEditingController();
-  var startdatecontroller = TextEditingController();
-  var enddatecontroller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FactureController>().getSevenDaysSales();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final double cardHeight = 180;
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18.0),
-          child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                const SizedBox(height:65),
-                Consumer<AuthController>(builder: (context, controller, child) {
-                  return _myDrawer(controller, context);
-                }),
-                const SizedBox(height: 45),
-                Consumer<ProductsController>(
-                  builder: (context, controller, child) {
-                    return TotalWalletBalance(
-                      context: context,
-                      totalBalance: '₦${controller.totalAmountSold.toStringAsFixed(2)}', // Display in Naira // Show total items sold
-                      percentage: 3.55, // Keep percentage if needed
-                    );
-                  },
-                ),
-                const SizedBox(
-                  height: 45,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: const Text("Dashboard", style: TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Iconsax.notification, color: Color(0xFF382959)),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            // 1. User Profile Header
+            Consumer<AuthController>(
+              builder: (context, authController, child) {
+                final user = authController.user;
+                return Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
+                      backgroundColor: const Color(0xFF382959),
+                      child: user?.photoURL == null ? const Icon(Iconsax.user, color: Colors.white) : null,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Welcome back,", style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                          Text(user?.displayName ?? "Store Manager", style: const TextStyle(color: Color(0xFF382959), fontSize: 18, fontWeight: FontWeight.w900)),
+                        ],
+                      ),
+                    ),
+                    if (authController.isloadingSignOut || authController.isloadingLogin)
+                      const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                    else
+                      IconButton(
+                        onPressed: () => user != null ? authController.google_signOut() : authController.signInWithGoogle(),
+                        icon: Icon(user != null ? Iconsax.logout : Iconsax.login, color: const Color(0xFF382959)),
+                      ),
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 25),
+
+            // Main Sales Card
+            // Main Sales Card
+            Consumer<ProductsController>(
+              builder: (context, prodController, child) {
+                return Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF4A2C7A),
+                        Color(0xFF2D1B52),
+                        Color(0xFF1A0F35),
+                      ],
+                      stops: [0.0, 0.5, 1.0],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF7B3FE4).withOpacity(0.35),
+                        blurRadius: 32,
+                        spreadRadius: -4,
+                        offset: const Offset(0, 12),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.4),
+                        blurRadius: 20,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.10),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Stack(
+                      children: [
+                        // Glowing orb top-right
+                        Positioned(
+                          top: -40,
+                          right: -40,
+                          child: Container(
+                            width: 160,
+                            height: 160,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  const Color(0xFF9B5DE5).withOpacity(0.30),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Subtle grid/noise texture overlay
+                        Positioned.fill(
+                          child: Opacity(
+                            opacity: 0.04,
+                            child: CustomPaint(painter: _DotGridPainter()),
+                          ),
+                        ),
+                        // Card content
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Header row
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(7),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF9B5DE5).withOpacity(0.18),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(
+                                            color: const Color(0xFF9B5DE5).withOpacity(0.3),
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Iconsax.chart_2,
+                                          color: Color(0xFFCB9EFF),
+                                          size: 15,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        "Total Sales",
+                                        style: TextStyle(
+                                          color: Color(0xFFB89ED4),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 11,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          const Color(0xFF9B5DE5).withOpacity(0.22),
+                                          const Color(0xFF6B3FA0).withOpacity(0.15),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: const Color(0xFF9B5DE5).withOpacity(0.35),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          width: 6,
+                                          height: 6,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color(0xFF5EF08A),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Color(0xFF5EF08A),
+                                                blurRadius: 6,
+                                                spreadRadius: 1,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        const Text(
+                                          "Earnings",
+                                          style: TextStyle(
+                                            color: Color(0xFFCFB3F5),
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                            letterSpacing: 0.4,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // Amount
+                              Text(
+                                  "₦${prodController.totalAmountSold.toStringAsFixed(2)}",
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1.1,
+                                  ),
+                                ),
+
+
+                              const SizedBox(height: 6),
+
+                              // Divider
+                              Container(
+                                height: 1,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.white.withOpacity(0.10),
+                                      Colors.transparent,
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 18),
+
+                              // Mini stats
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildMiniStat(
+                                      Iconsax.arrow_up_3,
+                                      "Earned",
+                                      "₦${prodController.totalAmountSold.toStringAsFixed(0)}",
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 1,
+                                    height: 36,
+                                    color: Colors.white.withOpacity(0.08),
+                                  ),
+                                  Expanded(
+                                    child: _buildMiniStat(
+                                      Iconsax.receipt_item,
+                                      "Invoices",
+                                      prodController.totalTransactions.toString(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 15),
+
+            // 2b. Separate Chart Card with Labels
+            Consumer<FactureController>(
+              builder: (context, factureController, child) {
+                double maxVal = 1000;
+                for (var s in factureController.lastSevenDaysSales) {
+                  if ((s.total_sales_in_day ?? 0) > maxVal) maxVal = s.total_sales_in_day!;
+                }
+                
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Inventory Report', style: TextStyle(color: Colors.white)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Daily Performance", style: TextStyle(color: Color(0xFF382959), fontSize: 14, fontWeight: FontWeight.bold)),
+                          Text("Last 7 Days (₦)", style: TextStyle(color: Colors.grey[500], fontSize: 11)),
+                        ],
+                      ),
+                      const SizedBox(height: 25),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Y-Axis Labels
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildYLabel("${(maxVal / 1000).toStringAsFixed(1)}k"),
+                              const SizedBox(height: 35),
+                              _buildYLabel("${(maxVal / 2000).toStringAsFixed(1)}k"),
+                              const SizedBox(height: 35),
+                              _buildYLabel("0"),
+                            ],
+                          ),
+                          const SizedBox(width: 10),
+                          // Chart Bars with Number Lines
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Stack(
+                                  alignment: Alignment.bottomCenter,
+                                  children: [
+                                    // Horizontal grid lines
+                                    Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        _buildGridLine(),
+                                        const SizedBox(height: 48),
+                                        _buildGridLine(),
+                                        const SizedBox(height: 48),
+                                        _buildGridLine(),
+                                      ],
+                                    ),
+                                    // Bars
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: factureController.lastSevenDaysSales.isEmpty 
+                                          ? List.generate(7, (index) => _buildPlaceholderBar())
+                                          : factureController.lastSevenDaysSales.map((sale) {
+                                              return _buildChartBar(sale.total_sales_in_day ?? 0, maxVal, const Color(0xFF382959));
+                                            }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                // X-Axis Labels (Day numbers)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: factureController.lastSevenDaysSales.isEmpty
+                                      ? List.generate(7, (index) => _buildXLabel("--"))
+                                      : factureController.lastSevenDaysSales.map((sale) {
+                                          return _buildXLabel(sale.day_in_month.toString());
+                                        }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                GridView.count(
-                  physics: NeverScrollableScrollPhysics(),
-                  // Disable GridView's scrolling
-                  shrinkWrap: true,
-                  // Allow GridView to fit inside SingleChildScrollView
-                  crossAxisCount: 2,
-                  // Number of columns in the grid
-                  crossAxisSpacing: 10.0,
-                  // Spacing between column
-                  childAspectRatio: 0.85,
-                  // Spacing between rows
-                  children: [
-                    recentTransaction(
-                      ontap: () {
-                        showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.parse('2022-01-01'),
-                                lastDate: DateTime.parse('2040-01-01'))
-                            .then((value) {
-                          //Todo: handle date to string
-                          //print(DateFormat.yMMMd().format(value!));
-                          var tdate = value != null
-                              ? value.toString().split(' ')
-                              : null;
-        
-                          if (tdate == null) {
-                            showToast(
-                                message: "date must be not empty or null ",
-                                status: ToastStatus.Error);
-                            //  print(datecontroller.text);
-                          } else {
-                            Get.to(() => ReceiptsScreen(tdate[0].toString()));
-                          }
-                          //datecontroller.text = tdate[0];
-                        });
-                      },
-                      icondata: Iconsax.receipt,
-                      myCrypto: 'Receipts',
-                      icon: LucideIcons.box,
-                      backgroundColor: const Color(0xFF2C2C2E),
-                      iconColor: Colors.white,
-                      textColor: Colors.white,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40),
-                        bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(40),
-                      ),
-                      height: cardHeight,
-                    ),
-                    recentTransaction(
-                      ontap: () {
-                        datecontroller.clear();
-                        showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.parse('2022-01-01'),
-                          lastDate: DateTime.parse('2040-01-01'),
-                        ).then((value) async {
-                          if (value != null) {
-                            var selectedDate = value.toString().split(' ')[0];
-                            try {
-                              await context
-                                  .read<FactureController>()
-                                  .getReportByDate(selectedDate)
-                                  .then((value) {
-                                // print(value.length.toString());
-                                _openReportByDateOrBetween(value, selectedDate);
-                              });
-                            } catch (e) {
-                              showToast(
-                                message: "Error getting report: $e",
-                                status: ToastStatus.Error,
-                              );
-                            }
-                          } else {
-                            showToast(
-                              message: "Date must not be empty or null",
-                              status: ToastStatus.Error,
-                            );
-                          }
-                        });
-                      },
-                      icondata: Iconsax.calendar,
-                      myCrypto: 'Daily \nTransactions',
-                      icon: LucideIcons.shapes,
-                      backgroundColor: const Color(0xFF387F36),
-                      iconColor: Colors.black,
-                      textColor: Colors.black,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(40),
-                        topRight: Radius.circular(40),
-                        bottomLeft: Radius.circular(40),
-                        bottomRight: Radius.circular(40),
-                      ),
-                      height: cardHeight,
-                    ),
-                    // Add more recentTransaction widgets as needed
-                  ],
-                ),
-              ],
+                );
+              },
             ),
-          ),
+            const SizedBox(height: 15),
+
+            // 3. Horizontal Stats Scroll
+            Consumer<ProductsController>(
+              builder: (context, prodController, child) {
+                return SizedBox(
+                  height: 150,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      _buildStatCard("Inventory", prodController.totalStock.toString(), "Total units", Iconsax.box, Colors.indigo),
+                      _buildStatCard("Transactions", prodController.totalTransactions.toString(), "Total sales", Iconsax.receipt_2, Colors.orangeAccent),
+                      _buildStatCard("Items Sold", prodController.totalItemsSold.toString(), "Total volume", Iconsax.shopping_cart, Colors.pinkAccent),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 15),
+
+            // Action Cards
+            _buildActionCard(
+              "Receipts History",
+              "View and search all transactions",
+              Iconsax.document_text,
+              Colors.orangeAccent,
+              () => Get.to(() => ReceiptsScreen()),
+            ),
+
+            const SizedBox(height: 12),
+
+            _buildActionCard(
+              "Analytics & Reports",
+              "Generate detailed business reports",
+              Iconsax.chart_21,
+              Colors.blueAccent,
+              () => Get.to(() => ReportsScreen()),
+            ),
+
+            const SizedBox(height: 30),
+          ],
         ),
       ),
     );
   }
 
-  _myDrawer(AuthController _controller, BuildContext context) {
-    String? _userImage = currentuser != null ? currentuser?.photoURL : null;
+  Widget _buildYLabel(String label) {
+    return Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 10, fontWeight: FontWeight.bold));
+  }
 
+  Widget _buildXLabel(String label) {
+    return SizedBox(width: 14, child: Center(child: Text(label, style: TextStyle(color: Colors.grey[500], fontSize: 9, fontWeight: FontWeight.bold))));
+  }
+
+  Widget _buildGridLine() {
+    return Container(width: double.infinity, height: 1, color: Colors.grey[100]);
+  }
+
+  Widget _buildChartBar(double value, double maxValue, Color color) {
+    double percentage = value / maxValue;
+    if (percentage < 0.05 && value > 0) percentage = 0.05;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        GestureDetector(
-          onTap: () async {
-            if (currentuser != null) {
-              await _controller.google_signOut();
-            }
-          },
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Sign Out',
-                      style: TextStyle(color: Colors.white),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              if (_controller.isloadingLogin)
-                CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-            ],
+        Container(
+          width: 14,
+          height: 96 * percentage,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
-        SizedBox(
-          height: 20,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: 10),
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                    image: _userImage != null
-                        ? NetworkImage("$_userImage")
-                        : AssetImage(
-                            "assets/images/default_image.png",
-                          ) as ImageProvider,
-                    fit: BoxFit.fill),
-                //whatever image you can put here
-              ),
-            ),
-            currentuser == null
-                ? Icon(
-                    Icons.cloud_off,
-                    color: Colors.grey.shade600,
-                    size: 35,
-                  )
-                : Icon(
-                    Icons.cloud_outlined,
-                    color: Colors.green.shade800,
-                    size: 35,
-                  ),
-          ],
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        GestureDetector(
-          onTap: () async {
-            if (currentuser == null) {
-              await _controller.signInWithGoogle().then((value) {
-                showToast(
-                    message: _controller.statusLoginMessage,
-                    status: _controller.toastLoginStatus);
-              });
-            }
-          },
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _controller.getDrawerTitle().toString(),
-                      style: TextStyle(color: Colors.white, letterSpacing: 2),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Text(
-                      _controller.getDrawerSubTitle().toString(),
-                      style: TextStyle(color: Colors.white),
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              if (_controller.isloadingLogin)
-                CircularProgressIndicator(
-                  color: Colors.white,
-                ),
-            ],
-          ),
-        )
       ],
     );
   }
 
-
-  Future<void> deleteDatabase() => databaseFactory.deleteDatabase(databasepath);
-  Future<void> _openReportByDateOrBetween(
-      List<DetailsFactureModel> list, String startDate,
-      {String? endDate}) async {
-
-    try {
-
-      final pdfFile = await PdfApi.generateReport(
-        list,
-        startDate: startDate,
-        endDate: endDate,
-      );
-      PdfApi.openFile(pdfFile);
-    } catch (e) {
-      print('Error generating PDF report: $e');
-      // Handle error as needed
-    }
+  Widget _buildPlaceholderBar() {
+    return Container(
+      width: 14,
+      height: 10,
+      decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(4)),
+    );
   }
-}
-
-class recentTransaction extends StatelessWidget {
-  const recentTransaction({
-    super.key,
-    required this.icondata,
-    required this.myCrypto,
-    required this.ontap,
-    required this.icon,
-    required this.backgroundColor,
-    required this.iconColor,
-    required this.textColor,
-    required this.borderRadius, required this.height,
-  });
-
-  final IconData icondata;
-  final String myCrypto;
-  final VoidCallback ontap;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color iconColor;
-  final Color textColor;
-  final BorderRadius borderRadius;
-  final double height;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMiniStat(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 22),
-      child: GestureDetector(
-        onTap: ontap,
-        child: Container(
-          padding: const EdgeInsets.all(25),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: borderRadius,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.07),
+              borderRadius: BorderRadius.circular(9),
             ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+            child: Icon(icon, color: const Color(0xFFCB9EFF), size: 14),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                size: 50,color: textColor,
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.40),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    myCrypto,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: textColor),
-                  ),
-                ],
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
-}
 
-class SummaryTileCustom extends StatelessWidget {
-  final String count;
-  final String label;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color iconColor;
-  final Color textColor;
-  final BorderRadius borderRadius;
 
-  const SummaryTileCustom({
-    Key? key,
-    required this.count,
-    required this.label,
-    required this.icon,
-    required this.backgroundColor,
-    required this.iconColor,
-    required this.textColor,
-    required this.borderRadius,
-  }) : super(key: key);
+  Widget _buildStatCard(String title, String value, String subtitle, IconData icon, Color color) {
+    return Container(
+      width: 160,
+      margin: const EdgeInsets.only(right: 15),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(backgroundColor: color.withOpacity(0.1), radius: 18, child: Icon(icon, color: color, size: 18)),
+          const Spacer(),
+          Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600)),
+          Text(value, style: const TextStyle(color: Color(0xFF382959), fontSize: 22, fontWeight: FontWeight.w900)),
+          Text(subtitle, style: TextStyle(color: Colors.grey[400], fontSize: 10)),
+        ],
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: borderRadius,
+  Widget _buildActionCard(String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
       child: Container(
-        color: backgroundColor,
-        padding: EdgeInsets.all(20),
-        height: 140, // Same height for all to align
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+        child: Row(
           children: [
-            Icon(icon, color: iconColor, size: 36),
-            const SizedBox(height: 15),
-            Text(
-              count,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(16)),
+              child: Icon(icon, color: color, size: 26),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(color: Color(0xFF382959), fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: textColor.withOpacity(0.8),
-                fontSize: 16,
-              ),
-            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 14),
           ],
         ),
       ),
     );
   }
 }
-
-
-class TileWidget extends StatelessWidget {
-  final String count;
-  final String label;
-  final IconData icon;
-  final Color backgroundColor;
-  final Color iconColor;
-  final Color textColor;
-  final BorderRadius borderRadius;
-  final double height;
-
-  const TileWidget({
-    super.key,
-    required this.count,
-    required this.label,
-    required this.icon,
-    required this.backgroundColor,
-    required this.iconColor,
-    required this.textColor,
-    required this.borderRadius,
-    required this.height,
-  });
+class _DotGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = Colors.white;
+    const spacing = 18.0;
+    for (double x = 0; x < size.width; x += spacing) {
+      for (double y = 0; y < size.height; y += spacing) {
+        canvas.drawCircle(Offset(x, y), 1, paint);
+      }
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: borderRadius,
-      child: Container(
-        height: height,
-        color: backgroundColor,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: iconColor, size: 40),
-              const SizedBox(height: 16),
-              Text(
-                count,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: textColor.withOpacity(0.8),
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

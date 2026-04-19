@@ -13,85 +13,71 @@ class MarketLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     var controller = Provider.of<LayoutController>(context);
     return Scaffold(
-      backgroundColor:Colors.black,
+      backgroundColor: Colors.grey[50],
       appBar: controller.currentIndex == 0
           ? null
           : AppBar(
-        toolbarHeight: 100,
-        centerTitle: true,
-        flexibleSpace: Container(
-          color: Colors.green,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              toolbarHeight: 80,
+              centerTitle: true,
+              title: Column(
+                children: [
+                  Text(
+                    controller.appbar_title[controller.currentIndex],
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      color: Color(0xFF382959),
+                    ),
+                  ),
+                  Text(
+                    controller.sub_appbar_title[controller.currentIndex],
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+      body: controller.screens[controller.currentIndex],
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
-        title: Center(
-          child: Column(
-            children: [
-              Text(
-                controller.appbar_title[controller.currentIndex].toString(),
-                style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                controller.sub_appbar_title[controller.currentIndex].toString(),
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-            ],
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BottomNavigationBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: const Color(0xFF382959), // Premium green
+            unselectedItemColor: Colors.grey[400],
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+            showUnselectedLabels: true,
+            onTap: (index) {
+              controller.onchangeIndex(index);
+            },
+            currentIndex: controller.currentIndex,
+            items: controller.bottomItems,
           ),
         ),
       ),
-
-      body: controller.screens[controller.currentIndex],
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: BottomNavigationBar(
-          backgroundColor:Colors.black,
-          elevation: 30,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: defaultColor,
-          unselectedItemColor: Colors.white,
-          onTap: (index) {
-            controller.onchangeIndex(index);
-          },
-          currentIndex: controller.currentIndex,
-          items: controller.bottomItems,
-        ),
-      ),
     );
   }
 
-  _buildSearchField(
-    BuildContext context,
-    String hint,
-  ) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: defaultTextFormField(
-          //NOTE to open keyboard when pressing on search button
-          focus: true,
-          onchange: (value) {
-            if (value!.length > 1) {
-              context.read<ProductsController>().search_In_Products(value);
-              //c.search_In_Products(value);
-            }
-          },
-          inputtype: TextInputType.name,
-          hinttext: hint,
-          border: InputBorder.none,
-          cursorColor: Colors.white,
-          textColor: Colors.white,
-          hintcolor: Colors.white54,
-          suffixIcon: IconButton(
-            icon: Icon(
-              Icons.close,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              context.read<ProductsController>().clearSearch();
-              context
-                  .read<LayoutController>()
-                  .onChangeSearchInProductsStatus(false);
-            },
-          )),
-    );
-  }
 
 
   Future<void> deleteDatabase() => databaseFactory.deleteDatabase(databasepath);

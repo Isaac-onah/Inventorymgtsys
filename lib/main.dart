@@ -12,6 +12,7 @@ import 'package:myinventory/firebase_options.dart';
 import 'package:myinventory/screens/splash_screen/splash_screen.dart';
 import 'package:myinventory/shared/constant.dart';
 import 'package:myinventory/shared/local/cash_helper.dart';
+import 'package:myinventory/controllers/layout_controller.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -24,18 +25,18 @@ Future<void> main() async {
   // });
 
   // Initialize the locale data
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      print("Firebase Initialized Successfully");
+    }
+  } catch (e) {
+    print("Firebase initialization error: $e");
+  }
   await initializeDateFormatting('en_US', null);
 
-  if (Platform.isAndroid) {
-    await Firebase.initializeApp(
-      name: 'driver',
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } else if (Platform.isIOS) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  }
   await CashHelper.init();
 
   currentuser = await CashHelper.getUser() ?? null;
