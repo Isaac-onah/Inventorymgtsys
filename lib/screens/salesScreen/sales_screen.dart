@@ -233,44 +233,88 @@ class _SellScreenState extends State<SalesScreen> {
 
   Widget _buildCheckoutSection(ProductsController controller) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Total Price", style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.w500)),
-              Text(
-                "₦${controller.totalprice.toStringAsFixed(2)}",
-                style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 28, fontWeight: FontWeight.w900),
-              ),
-            ],
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.05),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1B5E20),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                elevation: 0,
+        ],
+      ),
+      child: Row(
+        children: [
+          /// LEFT SIDE
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Total Price",
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  "₦${controller.totalprice.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                    color: Color(0xFF1B5E20),
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// RIGHT BUTTON
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1B5E20),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
               ),
-              onPressed: controller.basket_products.isEmpty ? null : () => _handleCheckout(controller),
-              child: const Text("Continue to Payment", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            onPressed: controller.basket_products.isEmpty
+                ? null
+                : () => _handleCheckout(controller),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Checkout",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Icon(Icons.arrow_forward_rounded, size: 18),
+              ],
             ),
           ),
         ],
       ),
     );
   }
-
   void _handleCheckout(ProductsController controller) async {
     double currentTotal = controller.totalprice;
     dynamic res = await Get.to(() => CashScreen(controller.totalprice));
