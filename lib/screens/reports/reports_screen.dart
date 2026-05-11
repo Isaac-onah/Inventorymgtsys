@@ -36,7 +36,7 @@ class ReportsScreen extends StatelessWidget {
       "title": "Most Profitable",
       "subtitle": "Products generating highest profit",
       "icon": Iconsax.money_send,
-      "color": Colors.purple,
+      "color": Colors.lightGreen,
       "type": "profitable",
     },
     {
@@ -73,7 +73,7 @@ class ReportsScreen extends StatelessWidget {
           children: [
             const Text(
               "Business Reports",
-              style: TextStyle(color: Color(0xFF382959), fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Color(0xFF1B5E20), fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
@@ -149,7 +149,7 @@ class ReportsScreen extends StatelessWidget {
             const Spacer(),
             Text(
               option['title'],
-              style: const TextStyle(color: Color(0xFF382959), fontSize: 15, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 15, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(

@@ -33,11 +33,11 @@ class _CashScreenState extends State<CashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Payment", style: TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold)),
+        title: const Text("Payment", style: TextStyle(color: Color(0xFF1B5E20), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFF382959)),
+        iconTheme: const IconThemeData(color: Color(0xFF1B5E20)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -59,7 +59,7 @@ class _CashScreenState extends State<CashScreen> {
                   const SizedBox(height: 12),
                   Text(
                     "₦${widget.total_amount.toStringAsFixed(2)}",
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 36, color: Color(0xFF382959)),
+                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 36, color: Color(0xFF1B5E20)),
                   ),
                 ],
               ),
@@ -72,7 +72,7 @@ class _CashScreenState extends State<CashScreen> {
                   padding: EdgeInsets.only(left: 4, bottom: 10),
                   child: Text(
                     "Cash Received",
-                    style: TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(color: Color(0xFF1B5E20), fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
                 TextFormField(
@@ -89,9 +89,9 @@ class _CashScreenState extends State<CashScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(18),
-                      borderSide: const BorderSide(color: Color(0xFF382959), width: 2),
+                      borderSide: const BorderSide(color: Color(0xFF1B5E20), width: 2),
                     ),
-                    prefixIcon: const Icon(Icons.payments_outlined, color: Color(0xFF382959)),
+                    prefixIcon: const Icon(Icons.payments_outlined, color: Color(0xFF1B5E20)),
                     suffixIcon: IconButton(
                       icon: const Icon(Iconsax.close_circle5, color: Colors.grey),
                       onPressed: () => text_receivedController.clear(),
@@ -106,7 +106,7 @@ class _CashScreenState extends State<CashScreen> {
               height: 60,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF382959),
+                  backgroundColor: const Color(0xFF1B5E20),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   elevation: 0,
@@ -183,7 +183,7 @@ class ProductCard extends StatelessWidget {
               children: [
                 Text(
                   productName,
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF382959)),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1B5E20)),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -204,7 +204,7 @@ class ProductCard extends StatelessWidget {
               ),
               child: Text(
                 "x$quantity",
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF382959)),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1B5E20)),
               ),
             ),
           ),

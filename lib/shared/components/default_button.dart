@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 Widget defaultButton(
         {double width = double.infinity,
-        Color background =const Color(0xFF382959),
+        Color background =const Color(0xFF1B5E20),
         VoidCallback? onpress,
         required String text,
         double radius = 10,

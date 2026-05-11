@@ -28,7 +28,7 @@ class MarketLayout extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF382959),
+                      color: Color(0xFF1B5E20),
                     ),
                   ),
                   Text(
@@ -62,7 +62,7 @@ class MarketLayout extends StatelessWidget {
             backgroundColor: Colors.white,
             elevation: 0,
             type: BottomNavigationBarType.fixed,
-            selectedItemColor: const Color(0xFF382959), // Premium green
+            selectedItemColor: const Color(0xFF1B5E20), // Premium green
             unselectedItemColor: Colors.grey[400],
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),

@@ -78,10 +78,10 @@ class _SellScreenState extends State<SalesScreen> {
               color: const Color(0xFFF0F9F0),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.check_circle, size: 80, color: Color(0xFF382959)),
+            child: const Icon(Icons.check_circle, size: 80, color: Color(0xFF1B5E20)),
           ),
           const SizedBox(height: 24),
-          const Text("Completed!", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Color(0xFF382959))),
+          const Text("Completed!", style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Color(0xFF1B5E20))),
           const SizedBox(height: 8),
           Text("Transaction processed successfully", style: TextStyle(color: Colors.grey[600], fontSize: 16)),
           const SizedBox(height: 40),
@@ -107,7 +107,7 @@ class _SellScreenState extends State<SalesScreen> {
             height: 60,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF382959),
+                backgroundColor: const Color(0xFF1B5E20),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                 elevation: 0,
@@ -129,7 +129,7 @@ class _SellScreenState extends State<SalesScreen> {
         Text(
           "₦$value", 
           style: TextStyle(
-            color: color ?? const Color(0xFF382959), 
+            color: color ?? const Color(0xFF1B5E20), 
             fontSize: isBold ? 24 : 18, 
             fontWeight: isBold ? FontWeight.w900 : FontWeight.bold
           )
@@ -145,7 +145,7 @@ class _SellScreenState extends State<SalesScreen> {
           key: qrKey,
           onQRViewCreated: onQRViewCreatedCallback,
           overlay: QrScannerOverlayShape(
-            borderColor: const Color(0xFF382959),
+            borderColor: const Color(0xFF1B5E20),
             borderWidth: 8,
             borderLength: 30,
             borderRadius: 16,
@@ -220,10 +220,10 @@ class _SellScreenState extends State<SalesScreen> {
               height: 54,
               width: 54,
               decoration: BoxDecoration(
-                color: const Color(0xFF382959).withOpacity(0.1),
+                color: const Color(0xFF1B5E20).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Iconsax.scan_barcode, color: Color(0xFF382959), size: 26),
+              child: const Icon(Iconsax.scan_barcode, color: Color(0xFF1B5E20), size: 26),
             ),
           ),
         ],
@@ -247,7 +247,7 @@ class _SellScreenState extends State<SalesScreen> {
               Text("Total Price", style: TextStyle(color: Colors.grey[600], fontSize: 16, fontWeight: FontWeight.w500)),
               Text(
                 "₦${controller.totalprice.toStringAsFixed(2)}",
-                style: const TextStyle(color: Color(0xFF382959), fontSize: 28, fontWeight: FontWeight.w900),
+                style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 28, fontWeight: FontWeight.w900),
               ),
             ],
           ),
@@ -257,7 +257,7 @@ class _SellScreenState extends State<SalesScreen> {
             height: 60,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF382959),
+                backgroundColor: const Color(0xFF1B5E20),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                 elevation: 0,
@@ -322,14 +322,14 @@ class _SellScreenState extends State<SalesScreen> {
                   color: const Color(0xFFF0F9F0),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Iconsax.box, color: Color(0xFF382959), size: 20),
+                child: const Icon(Iconsax.box, color: Color(0xFF1B5E20), size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(suggestion.name.toString(), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF382959))),
+                    Text(suggestion.name.toString(), style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1B5E20))),
                     Text('₦${suggestion.price.toString()}', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                   ],
                 ),

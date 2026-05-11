@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 import 'package:myinventory/controllers/facture_controller.dart';
 import 'package:myinventory/models/details_facture.dart';
@@ -76,7 +77,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(primary: Color(0xFF382959)),
+            colorScheme: const ColorScheme.light(primary: Color(0xFF1B5E20)),
           ),
           child: child!,
         );
@@ -106,7 +107,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
         actions: [
           if (!_isLoading && _data.isNotEmpty)
             IconButton(
-              icon: const Icon(Icons.picture_as_pdf, color: Color(0xFF382959)),
+              icon: const Icon(Icons.picture_as_pdf, color: Color(0xFF1B5E20)),
               onPressed: _exportToPdf,
             ),
         ],
@@ -116,7 +117,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
           _buildFilters(),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: Color(0xFF382959)))
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF1B5E20)))
                 : _data.isEmpty
                     ? _buildEmptyState()
                     : _buildDataList(),
@@ -153,7 +154,7 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
                     max: 100,
                     divisions: 19,
                     label: _limit.toString(),
-                    activeColor: const Color(0xFF382959),
+                    activeColor: const Color(0xFF1B5E20),
                     onChanged: (val) {
                       setState(() => _limit = val.toInt());
                     },
@@ -183,9 +184,9 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
             Text(label, style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500)),
             Row(
               children: [
-                Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF382959))),
+                Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1B5E20))),
                 const SizedBox(width: 8),
-                const Icon(Icons.edit, size: 16, color: Color(0xFF382959)),
+                const Icon(Icons.edit, size: 16, color: Color(0xFF1B5E20)),
               ],
             ),
           ],
@@ -208,59 +209,138 @@ class _ReportPreviewScreenState extends State<ReportPreviewScreen> {
   }
 
   Widget _buildDataList() {
-    return ListView.separated(
-      padding: const EdgeInsets.all(16),
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
       itemCount: _data.length,
-      separatorBuilder: (context, index) => const Divider(),
       itemBuilder: (context, index) {
         final item = _data[index];
-        return _buildItemRow(item);
+        return _buildItemCard(item);
       },
     );
   }
 
-  Widget _buildItemRow(dynamic item) {
+  Widget _buildItemCard(dynamic item) {
     String title = "";
     String subtitle = "";
     String trailing = "";
+    IconData icon = Iconsax.box;
+    Color iconColor = const Color(0xFF1B5E20);
 
     if (item is DetailsFactureModel) {
       title = item.name ?? "Unknown";
-      subtitle = "Qty: ${item.qty}";
+      subtitle = "Order Date: ${item.facturedate ?? 'N/A'}";
       trailing = "₦${item.totalprice}";
+      icon = Iconsax.receipt_item;
     } else if (item is BestSellingVmodel) {
       title = item.name ?? "Unknown";
-      subtitle = "Total Sold";
-      trailing = "${item.qty} units";
+      subtitle = "Top Selling Item";
+      trailing = "${item.qty} Sold";
+      icon = Iconsax.award;
+      iconColor = Colors.orange;
     } else if (item is ProfitableVModel) {
       title = item.name ?? "Unknown";
-      subtitle = "Total Profit";
-      trailing = "₦${item.total_profit}";
+      subtitle = "Profit Analysis";
+      trailing = "₦${double.tryParse(item.total_profit.toString())?.toStringAsFixed(2) ?? '0.00'}";
+      icon = Iconsax.money_send;
+      iconColor = Colors.lightGreen;
     } else if (item is LowQtyVModel) {
       title = item.name ?? "Unknown";
-      subtitle = "Stock Level";
+      subtitle = "Critical Stock Level";
       trailing = "${item.qty} left";
+      icon = Iconsax.status_up;
+      iconColor = Colors.red;
     } else if (item is EarnSpentVmodel) {
       title = item.name ?? "Unknown";
       subtitle = "Earned: ₦${item.total_earn}";
       trailing = "Spent: ₦${item.total_spent}";
+      icon = Iconsax.activity;
+      iconColor = Colors.teal;
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-              ],
-            ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          Text(trailing, style: const TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.w900, fontSize: 16)),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: iconColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(icon, color: iconColor, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Color(0xFF1B5E20),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          Row(
+mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    trailing,
+                    style: const TextStyle(
+                      color: Color(0xFF1B5E20),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  if (item is DetailsFactureModel)
+                    Text(
+                      "Qty: ${item.qty}",
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
     );

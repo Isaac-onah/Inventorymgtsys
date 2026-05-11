@@ -51,8 +51,8 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: Color(0xFF382959),
-            colorScheme: const ColorScheme.light(primary: Color(0xFF382959), surface: Colors.white),
+            primaryColor: Color(0xFF1B5E20),
+            colorScheme: const ColorScheme.light(primary: Color(0xFF1B5E20), surface: Colors.white),
             buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
           ),
           child: child!,
@@ -109,7 +109,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
               );
               await PdfApi.openFile(file);
             },
-            backgroundColor: const Color(0xFF382959),
+            backgroundColor: const Color(0xFF1B5E20),
             icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
             label: const Text("Export PDF", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           );
@@ -165,19 +165,19 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                               decoration: BoxDecoration(
-                                color: Color(0xFF382959).withOpacity(0.1),
+                                color: Color(0xFF1B5E20).withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.date_range, color: Color(0xFF382959), size: 20),
+                                  const Icon(Icons.date_range, color: Color(0xFF1B5E20), size: 20),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Text(
                                       _selectedDateRange == null
                                           ? "Filter by Date Range"
                                           : "${DateFormat('MMM d, yyyy').format(_selectedDateRange!.start)} - ${DateFormat('MMM d, yyyy').format(_selectedDateRange!.end)}",
-                                      style: const TextStyle(color: Color(0xFF382959), fontSize: 14, fontWeight: FontWeight.bold),
+                                      style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 14, fontWeight: FontWeight.bold),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -288,15 +288,15 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                     margin: const EdgeInsets.only(right: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF382959).withOpacity(0.05),
+                      color: const Color(0xFF1B5E20).withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFF382959).withOpacity(0.1)),
+                      border: Border.all(color: const Color(0xFF1B5E20).withOpacity(0.1)),
                     ),
                     child: Center(
                       child: Text(
                         item.trim(),
                         style: const TextStyle(
-                          color: Color(0xFF382959),
+                          color: Color(0xFF1B5E20),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -318,14 +318,14 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                   Text("Total Amount", style: TextStyle(color: Colors.grey[500], fontSize: 12, fontWeight: FontWeight.w500)),
                   Text(
                     '₦${model.price.toString()}',
-                    style: const TextStyle(color: Color(0xFF382959), fontSize: 24, fontWeight: FontWeight.w900),
+                    style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 24, fontWeight: FontWeight.w900),
                   ),
                 ],
               ),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF382959).withOpacity(0.1),
-                  foregroundColor: const Color(0xFF382959),
+                  backgroundColor: const Color(0xFF1B5E20).withOpacity(0.1),
+                  foregroundColor: const Color(0xFF1B5E20),
                   elevation: 0,
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -361,7 +361,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
                       context: context,
                       buttons: [
                         DialogButton(
-                          color: const Color(0xFF382959),
+                          color: const Color(0xFF1B5E20),
                           radius: BorderRadius.circular(16),
                           child: const Text("Close", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
                           onPressed: () => Navigator.pop(context),
@@ -435,7 +435,7 @@ class _ReceiptsScreenState extends State<ReceiptsScreen> {
           child: Text(
             '₦$price',
             textAlign: TextAlign.right,
-            style: const TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.w900, fontSize: 18),
+            style: const TextStyle(color: Color(0xFF1B5E20), fontWeight: FontWeight.w900, fontSize: 18),
           ),
         ),
       ],

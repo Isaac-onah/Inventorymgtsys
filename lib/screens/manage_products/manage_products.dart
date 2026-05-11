@@ -98,7 +98,7 @@ class ManageProductsScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         elevation: 4,
-        backgroundColor: const Color(0xFF382959),
+        backgroundColor: const Color(0xFF1B5E20),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
         onPressed: () {
           Get.to(AddProductScreen());
@@ -153,7 +153,7 @@ class ProductCard extends StatelessWidget {
                 Text(
                   productName,
                   style: const TextStyle(
-                    color: Color(0xFF382959),
+                    color: Color(0xFF1B5E20),
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -179,7 +179,7 @@ class ProductCard extends StatelessWidget {
                       child: Text(
                         isInStock ? 'In Stock' : 'Out of Stock',
                         style: TextStyle(
-                          color: isInStock ? const Color(0xFF382959) : Colors.redAccent,
+                          color: isInStock ? const Color(0xFF1B5E20) : Colors.redAccent,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
@@ -205,7 +205,7 @@ class ProductCard extends StatelessWidget {
               Text(
                 '₦$price',
                 style: const TextStyle(
-                  color: Color(0xFF382959),
+                  color: Color(0xFF1B5E20),
                   fontSize: 18,
                   fontWeight: FontWeight.w900,
                 ),

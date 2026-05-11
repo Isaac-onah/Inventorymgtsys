@@ -55,11 +55,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Add New Product", style: TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold)),
+        title: const Text("Add New Product", style: TextStyle(color: Color(0xFF1B5E20), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFF382959)),
+        iconTheme: const IconThemeData(color: Color(0xFF1B5E20)),
       ),
       body: is_onScan ? _buildScannerView() : _buildFormView(context),
     );
@@ -72,7 +72,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           key: qrKey,
           onQRViewCreated: onQRViewCreatedCallback,
           overlay: QrScannerOverlayShape(
-            borderColor: const Color(0xFF382959),
+            borderColor: const Color(0xFF1B5E20),
             borderWidth: 8,
             borderLength: 30,
             borderRadius: 16,
@@ -128,7 +128,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               hint: "Scan or enter barcode",
               icon: Iconsax.scan_barcode,
               suffixIcon: IconButton(
-                icon: const Icon(Iconsax.maximize_3, color: Color(0xFF382959)),
+                icon: const Icon(Iconsax.maximize_3, color: Color(0xFF1B5E20)),
                 onPressed: () => setState(() => is_onScan = true),
               ),
               validator: (v) => v!.isEmpty ? "Barcode is required" : null,
@@ -182,7 +182,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               height: 60,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF382959),
+                  backgroundColor: const Color(0xFF1B5E20),
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   elevation: 0,
@@ -211,7 +211,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF382959))),
+          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1B5E20))),
         ),
         TextFormField(
           controller: controller,

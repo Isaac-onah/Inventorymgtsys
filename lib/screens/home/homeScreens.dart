@@ -29,13 +29,13 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text("Dashboard", style: TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold)),
+        title: const Text("Dashboard", style: TextStyle(color: Color(0xFF1B5E20), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Iconsax.notification, color: Color(0xFF382959)),
+            icon: const Icon(Iconsax.notification, color: Color(0xFF1B5E20)),
             onPressed: () {},
           ),
         ],
@@ -53,7 +53,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                     CircleAvatar(
                       radius: 25,
                       backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-                      backgroundColor: const Color(0xFF382959),
+                      backgroundColor: const Color(0xFF1B5E20),
                       child: user?.photoURL == null ? const Icon(Iconsax.user, color: Colors.white) : null,
                     ),
                     const SizedBox(width: 12),
@@ -62,7 +62,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("Welcome back,", style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-                          Text(user?.displayName ?? "Store Manager", style: const TextStyle(color: Color(0xFF382959), fontSize: 18, fontWeight: FontWeight.w900)),
+                          Text(user?.displayName ?? "Store Manager", style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 18, fontWeight: FontWeight.w900)),
                         ],
                       ),
                     ),
@@ -71,7 +71,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                     else
                       IconButton(
                         onPressed: () => user != null ? authController.google_signOut() : authController.signInWithGoogle(),
-                        icon: Icon(user != null ? Iconsax.logout : Iconsax.login, color: const Color(0xFF382959)),
+                        icon: Icon(user != null ? Iconsax.logout : Iconsax.login, color: const Color(0xFF1B5E20)),
                       ),
                   ],
                 );
@@ -91,15 +91,15 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Color(0xFF4A2C7A),
-                        Color(0xFF2D1B52),
-                        Color(0xFF1A0F35),
+                        Color(0xFF1B5E20),
+                        Color(0xFF0D3310),
+                        Color(0xFF051C06),
                       ],
                       stops: [0.0, 0.5, 1.0],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF7B3FE4).withOpacity(0.35),
+                        color: const Color(0xFF43A047).withOpacity(0.35),
                         blurRadius: 32,
                         spreadRadius: -4,
                         offset: const Offset(0, 12),
@@ -130,7 +130,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                               shape: BoxShape.circle,
                               gradient: RadialGradient(
                                 colors: [
-                                  const Color(0xFF9B5DE5).withOpacity(0.30),
+                                  const Color(0xFF66BB6A).withOpacity(0.30),
                                   Colors.transparent,
                                 ],
                               ),
@@ -159,16 +159,16 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                       Container(
                                         padding: const EdgeInsets.all(7),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF9B5DE5).withOpacity(0.18),
+                                          color: const Color(0xFF66BB6A).withOpacity(0.18),
                                           borderRadius: BorderRadius.circular(10),
                                           border: Border.all(
-                                            color: const Color(0xFF9B5DE5).withOpacity(0.3),
+                                            color: const Color(0xFF66BB6A).withOpacity(0.3),
                                             width: 1,
                                           ),
                                         ),
                                         child: const Icon(
                                           Iconsax.chart_2,
-                                          color: Color(0xFFCB9EFF),
+                                          color: Color(0xFFA5D6A7),
                                           size: 15,
                                         ),
                                       ),
@@ -176,7 +176,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                       const Text(
                                         "Total Sales",
                                         style: TextStyle(
-                                          color: Color(0xFFB89ED4),
+                                          color: Color(0xFFC8E6C9),
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
                                           letterSpacing: 0.3,
@@ -192,13 +192,13 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          const Color(0xFF9B5DE5).withOpacity(0.22),
-                                          const Color(0xFF6B3FA0).withOpacity(0.15),
+                                          const Color(0xFF66BB6A).withOpacity(0.22),
+                                          const Color(0xFF388E3C).withOpacity(0.15),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(20),
                                       border: Border.all(
-                                        color: const Color(0xFF9B5DE5).withOpacity(0.35),
+                                        color: const Color(0xFF66BB6A).withOpacity(0.35),
                                         width: 1,
                                       ),
                                     ),
@@ -224,7 +224,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                         const Text(
                                           "Earnings",
                                           style: TextStyle(
-                                            color: Color(0xFFCFB3F5),
+                                            color: Color(0xFFE8F5E9),
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
                                             letterSpacing: 0.4,
@@ -324,7 +324,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text("Daily Performance", style: TextStyle(color: Color(0xFF382959), fontSize: 14, fontWeight: FontWeight.bold)),
+                          const Text("Daily Performance", style: TextStyle(color: Color(0xFF1B5E20), fontSize: 14, fontWeight: FontWeight.bold)),
                           Text("Last 7 Days (₦)", style: TextStyle(color: Colors.grey[500], fontSize: 11)),
                         ],
                       ),
@@ -371,7 +371,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
                                         children: factureController.lastSevenDaysSales.isEmpty 
                                           ? List.generate(7, (index) => _buildPlaceholderBar())
                                           : factureController.lastSevenDaysSales.map((sale) {
-                                              return _buildChartBar(sale.total_sales_in_day ?? 0, maxVal, const Color(0xFF382959));
+                                              return _buildChartBar(sale.total_sales_in_day ?? 0, maxVal, const Color(0xFF1B5E20));
                                             }).toList(),
                                       ),
                                     ),
@@ -495,7 +495,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
               color: Colors.white.withOpacity(0.07),
               borderRadius: BorderRadius.circular(9),
             ),
-            child: Icon(icon, color: const Color(0xFFCB9EFF), size: 14),
+            child: Icon(icon, color: const Color(0xFFA5D6A7), size: 14),
           ),
           const SizedBox(width: 10),
           Column(
@@ -539,7 +539,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
           CircleAvatar(backgroundColor: color.withOpacity(0.1), radius: 18, child: Icon(icon, color: color, size: 18)),
           const Spacer(),
           Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600)),
-          Text(value, style: const TextStyle(color: Color(0xFF382959), fontSize: 22, fontWeight: FontWeight.w900)),
+          Text(value, style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 22, fontWeight: FontWeight.w900)),
           Text(subtitle, style: TextStyle(color: Colors.grey[400], fontSize: 10)),
         ],
       ),
@@ -564,7 +564,7 @@ class _WalletHomeScreenState extends State<WalletHomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(color: Color(0xFF382959), fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(title, style: const TextStyle(color: Color(0xFF1B5E20), fontSize: 16, fontWeight: FontWeight.bold)),
                   Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                 ],
               ),

@@ -13,7 +13,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PdfApi {
-  static const PdfColor primaryColor = PdfColor.fromInt(0xFF382959);
+  static const PdfColor primaryColor = PdfColor.fromInt(0xFF1B5E20);
   static const PdfColor accentColor = PdfColor.fromInt(0xFF4CAF50);
 
   static Future<File> generateReceiptsReport(List<FactureModel> receipts, {String? subtitle}) async {

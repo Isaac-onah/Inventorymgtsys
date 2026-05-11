@@ -11,8 +11,8 @@ TextStyle get headerProductTable {
 LinearGradient get myLinearGradient {
   return const LinearGradient(
     colors: [
-      Color(0xFF4A2C7A),
-      Color(0xFF2D1B52),
+      Color(0xFF1B5E20),
+      Color(0xFF0D3310),
     ],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,

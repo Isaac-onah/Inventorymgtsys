@@ -51,11 +51,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Edit ${widget.model.name}", style: const TextStyle(color: Color(0xFF382959), fontWeight: FontWeight.bold)),
+        title: Text("Edit ${widget.model.name}", style: const TextStyle(color: Color(0xFF1B5E20), fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Color(0xFF382959)),
+        iconTheme: const IconThemeData(color: Color(0xFF1B5E20)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -118,7 +118,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 height: 60,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF382959),
+                    backgroundColor: const Color(0xFF1B5E20),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                     elevation: 0,
@@ -176,7 +176,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF382959))),
+          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1B5E20))),
         ),
         TextFormField(
           controller: controller,

@@ -173,8 +173,6 @@ class FactureController extends ChangeNotifier {
       {String? nbOfproduct, DateTime? currentdate}) async {
     _list_of_profitableProduct = [];
     var dbm = await marketdb.database;
-    // print("date : " + date.toString());
-    // print("today " + gettodayDate().toString());
 
     String query =
         "select df.barcode , df.name, SUM(df.qty) as qty , df.profit_per_item_on_sale as profit_per_item_on_sale , SUM(df.qty*df.profit_per_item_on_sale) as total_profit  from detailsfacture as df  join  factures as f on df.facture_id=f.id join  products as p on p.barcode = df.barcode";

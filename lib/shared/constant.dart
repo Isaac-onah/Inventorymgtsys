@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myinventory/models/user.dart';
 
-final defaultColor = Color(0xFF382959);
+final defaultColor = Color(0xFF1B5E20);
 
 //FOrmat  dd-mm-yyyy
 gettodayDate() {
